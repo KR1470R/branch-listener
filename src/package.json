@@ -1,0 +1,30 @@
+{
+  "name": "git-branch-listener",
+  "version": "1.0.0",
+  "description": "Listener of git branch reminds of new commits pushed in your specific branch by pushing sound notification. ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KR1470R/git-branch-listener.git"
+  },
+  "keywords": [
+    "node.js",
+    "typescript",
+    "git",
+    "observer",
+    "listener",
+    "GPL3.0",
+    "linux",
+    "bash",
+    "sh"
+  ],
+  "author": "KR1470R",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/KR1470R/git-branch-listener/issues"
+  },
+  "homepage": "https://github.com/KR1470R/git-branch-listener#readme"
+}
