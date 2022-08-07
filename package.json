@@ -4,6 +4,8 @@
   "description": "Listener of git branch reminds of new commits pushed in your specific branch by pushing sound notification. ",
   "main": "index.js",
   "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node ./dist/src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -26,5 +28,8 @@
   "bugs": {
     "url": "https://github.com/KR1470R/git-branch-listener/issues"
   },
-  "homepage": "https://github.com/KR1470R/git-branch-listener#readme"
+  "homepage": "https://github.com/KR1470R/git-branch-listener#readme",
+  "dependencies": {
+    "ts": "^0.2.2"
+  }
 }

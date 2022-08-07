@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+        "allowSyntheticDefaultImports": true,
+        "moduleResolution": "node",
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
+        "strict": true,
+        "noImplicitReturns": true,
+        "alwaysStrict": true,
+        "noFallthroughCasesInSwitch": true,
+        "incremental": true,
+        "module": "esnext",
+        "removeComments": true,
+        "sourceMap": false,
+        "target": "ES6",
+        "noErrorTruncation": true,
+        "importHelpers": false,
+        "baseUrl": "./src",
+        "rootDir": "./",
+        "outDir": "./dist"
+    },
+    "include": [
+        "src/**/*"
+    ]
+}
