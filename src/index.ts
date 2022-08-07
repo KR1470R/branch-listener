@@ -1,9 +1,11 @@
-import { getGitBranchURL } from "./util/extra";
+import { getGitBranchURL, getRandomInt } from "./util/extra";
 import { axios_config_git, minutes_difference } from "./util/globals";
 import default_config from "../configs/default_config.js";
 import user_config from "../configs/user_config.js";
 import { Config } from "./util/types";
 import axios from "axios";
+import player from "node-wav-player";
+import fs from "fs";
 
 if (!user_config.repo) throw new Error("Repository URL not found!");
 
@@ -54,4 +56,8 @@ getBranch()
     })
     .then(isSound => {
         console.log("isSound:", isSound);
+        if (isSound)
+            player.play({
+                path: `./assets/sounds/meow${getRandomInt(1, 3)}.wav`
+            });
     });
