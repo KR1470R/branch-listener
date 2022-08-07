@@ -45,9 +45,9 @@ getBranch()
         if (commit_date.year !== user_date.year) return Promise.resolve(false);
         if (commit_date.month !== user_date.month) return Promise.resolve(false);
         if (commit_date.day !== user_date.day) return Promise.resolve(false);
-        if (commit_date.hour !== user_date.day) return Promise.resolve(false);
+        if (commit_date.hour !== user_date.hour) return Promise.resolve(false);
 
-        if (!((user_date.minutes - commit_date.minutes) >= minutes_difference)) 
+        if ((user_date.minutes - commit_date.minutes) >= minutes_difference) 
             return Promise.resolve(false);
 
         return Promise.resolve(true);
