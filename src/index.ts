@@ -90,5 +90,5 @@ const app = express();
 app.listen(config.port, () => {
     console.log(`Listening at ${config.port}`);
     
-    setInterval(start, 5000);
+    setInterval(start, 5*60*1000);
 })
