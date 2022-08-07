@@ -1,5 +1,6 @@
 export type Config = {
-    repo_url: string;
+    username: string,
+    repo: string;
     branch?: string;
     timer?: number;
     port?: number;

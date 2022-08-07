@@ -1,6 +1,5 @@
 import { Config } from "./types";
 
-export const defineBranchCommitsURL = (config: Config) => {
-    if (config.repo_url.endsWith("/")) return `${config.repo_url}commits/${config.branch}`;
-    else return `${config.repo_url}/commits/${config.branch}`;
+export const getGitBranchURL = (config: Config) => {
+    return `https://api.github.com/repos/${config.username}/${config.repo}/branches/${config.branch}`;
 }

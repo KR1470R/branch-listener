@@ -1,5 +1,6 @@
 const user_config = {
-    repo_url: "https://github.com/KR1470R/git-branch-listener/",
+    username: "KR1470R",
+    repo: "git-branch-listener",
     branch: "",
     timer: "",
     port: ""
