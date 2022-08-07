@@ -5,4 +5,4 @@ export const axios_config_git = {
     }
 }
 
-export const minutes_difference = 20;
+export const minutes_difference = 25;
