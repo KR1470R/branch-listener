@@ -1,0 +1,5 @@
+{
+    "branch": "master",
+    "timer_interval": 300000,
+    "port": 3001
+}

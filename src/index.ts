@@ -1,21 +1,32 @@
 import { getGitBranchURL, getRandomInt } from "./util/extra";
 import { axios_config_git, minutes_difference } from "./util/globals";
-import default_config from "../configs/default_config.js";
-import user_config from "../configs/user_config.js";
+import JSONManager from "./util/JSONManager";
 import { Config } from "./util/types";
 import axios from "axios";
 import player from "node-wav-player";
 import express from "express";
 
+const default_config = new JSONManager("./configs/default_config.json").content as Config;
+const user_config = new JSONManager("./configs/user_config.json").content as Config;
+
+if (!user_config || Object.keys(user_config).length === 0) 
+    throw new Error("User config is empty! Tip: run setup to fill it.");
+if (!default_config || Object.keys(default_config).length === 0)
+    throw new Error("Default config is empty! Please, get original default config from this repository.");
+if (!user_config.username) throw new Error("Username not found!");
 if (!user_config.repo) throw new Error("Repository URL not found!");
+if (!user_config.branch) throw new Error("Branch not found!");
 
 const config: Config = {
     username: user_config.username,
     repo: user_config.repo,
-    branch: user_config.branch ? user_config.branch : default_config.default_branch,
-    timer: user_config.timer ? parseInt(user_config.timer) : default_config.timer,
-    port: user_config.port ? parseInt(user_config.port) : default_config.port
-}
+    branch: user_config.branch ? user_config.branch : default_config.branch,
+    timer_interval: user_config.timer_interval ? user_config.timer_interval : default_config.timer_interval,
+    port: user_config.port ? user_config.port : default_config.port
+};
+
+console.log(`Running with config: ${JSON.stringify(config, null, "\t")}\n`);
+
 let counter = 0;
 let prev_commit: string;
 let current_commit: string;
@@ -89,6 +100,6 @@ const app = express();
 
 app.listen(config.port, () => {
     console.log(`Listening at ${config.port}`);
-    
-    setInterval(start, 5*60*1000);
+    start();
+    setInterval(start, config.timer_interval);
 })
