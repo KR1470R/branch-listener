@@ -1,5 +1,5 @@
 import { getGitBranchURL, getRandomInt } from "./util/extra";
-import { axios_config_git, minutes_difference } from "./util/globals";
+import { axios_config_git } from "./util/globals";
 import JSONManager from "./util/JSONManager";
 import { Config } from "./util/types";
 import axios from "axios";
@@ -21,8 +21,11 @@ const config: Config = {
     username: user_config.username,
     repo: user_config.repo,
     branch: user_config.branch ? user_config.branch : default_config.branch,
-    timer_interval: user_config.timer_interval ? user_config.timer_interval : default_config.timer_interval,
-    port: user_config.port ? user_config.port : default_config.port
+    timer_interval: user_config.timer_interval ? 
+        user_config.timer_interval : default_config.timer_interval,
+    minutes_difference: user_config.minutes_difference ? 
+        user_config.minutes_difference : default_config.minutes_difference,
+    port: user_config.port ? user_config.port : default_config.port,
 };
 
 console.log(`Running with config: ${JSON.stringify(config, null, "\t")}\n`);
@@ -66,7 +69,7 @@ function start() {
                 if (commit_date.day !== user_date.day) return Promise.resolve(false);
                 if (commit_date.hour !== user_date.hour) return Promise.resolve(false);
 
-                if ((user_date.minutes - commit_date.minutes) >= minutes_difference) 
+                if ((user_date.minutes - commit_date.minutes) >= config.minutes_difference) 
                     return Promise.resolve(false);
 
                 if (current_commit !== prev_commit) {

@@ -4,5 +4,3 @@ export const axios_config_git = {
         "Access-Control-Allow-Origin": "*",
     }
 }
-
-export const minutes_difference = 25;

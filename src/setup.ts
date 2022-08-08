@@ -22,24 +22,33 @@ const quiz = () => {
                     if (answ) user_config.branch = answ;
                     else user_config.branch = default_config.branch;
 
-                    input.question(`Enter timer interval(default ${default_config.timer_interval}ms): `, (answ: any) => {
+                    input.question(`Enter port(default ${default_config.port}): `, (answ: any) => {
                         if (answ) {
+                            user_config.port = Number(answ);
                             if (!(/^\d+$/.test(answ))) 
-                                throw new Error("Timer must contain only digits! Try again.");
-                            user_config.timer_interval = Number(answ);
-                        }
-                        else user_config.timer_interval = default_config.timer_interval;
+                                throw new Error("Port must contain only digits! Try again.");
+                        } else user_config.port = default_config.port;
 
-                        input.question(`Enter port(default ${default_config.port}): `, (answ: any) => {
+                        input.question(`Enter timer interval(default ${default_config.timer_interval}ms): `, (answ: any) => {
                             if (answ) {
-                                user_config.port = Number(answ);
                                 if (!(/^\d+$/.test(answ))) 
-                                    throw new Error("Port must contain only digits! Try again.");
-                            }
-                            else user_config.port = default_config.port;
-
-                            resolve(1);
-                        });
+                                    throw new Error("Timer must contain only digits! Try again.");
+                                user_config.timer_interval = Number(answ);
+                            } else user_config.timer_interval = default_config.timer_interval;
+    
+                            input.question(
+                                `Enter minutes difference between commit publish(default ${default_config.minutes_difference}): `,
+                                (answ: any) => {
+                                    if (answ) {
+                                        if (!(/^\d+$/.test(answ))) 
+                                            throw new Error("Minutes difference must contain only digits! Try again.");
+                                        user_config.minutes_difference = Number(answ);
+                                    } else user_config.minutes_difference = default_config.minutes_difference;
+    
+                                    resolve(1);
+                                }
+                            );
+                        }); 
                     });
                 });
             });
