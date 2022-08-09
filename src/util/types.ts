@@ -1,9 +1,9 @@
 
 export type ConfigServer = {
+    cvs: string;
     port: number;
     timer_interval: number;
     minutes_difference: number;
-    cvs: string;
 }
 
 export type ConfigGit = {
@@ -20,3 +20,7 @@ export type ConfigBitbucket = {
 }
 
 export type Configs = ConfigServer | ConfigGit | ConfigBitbucket;
+
+export type supportableCVS = "git" | "bitbucket";
+
+export type supportable_configs = "server" | "git" | "bitbucket";
