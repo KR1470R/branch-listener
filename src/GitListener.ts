@@ -14,6 +14,7 @@ export default class GitListener {
     private counter: number = 0;
     private prev_commit!: string;
     private current_commit!: string;
+    private hours_difference: number = 0;
 
     constructor(config: ConfigGit, config_server: ConfigServer) {
         this.config = config;
@@ -54,12 +55,19 @@ export default class GitListener {
                 minutes: current_date.getMinutes() 
             }
 
+            console.log("commit date:", commit_date);
+            console.log("user date:", user_date);
+
             if (commit_date.year !== user_date.year) return Promise.resolve(false);
             if (commit_date.month !== user_date.month) return Promise.resolve(false);
             if (commit_date.day !== user_date.day) return Promise.resolve(false);
-            if (commit_date.hour !== user_date.hour) return Promise.resolve(false);
+            if (user_date.hour > commit_date.hour) 
+                this.hours_difference = (user_date.hour - commit_date.hour) * 60;
 
-            if ((user_date.minutes - commit_date.minutes) >= this.config_server.minutes_difference) 
+            if (
+                ((user_date.minutes - commit_date.minutes) + this.hours_difference) >= 
+                this.config_server.minutes_difference
+            ) 
                 return Promise.resolve(false);
 
             if (this.current_commit !== this.prev_commit) {
@@ -73,7 +81,7 @@ export default class GitListener {
             ) return Promise.resolve(false);
 
             return Promise.resolve(true);
-        } catch (error) {
+        } catch (error: any) {
             console.log("GITLISTENER ERROR:", error);
             return Promise.resolve(false);
         }

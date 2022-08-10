@@ -37,7 +37,9 @@ function listen_new_commit() {
 
         const start = async () => {
             const isSound = await listener.isSoundNewCommit();
+            console.log("is sound:", isSound);
             if (isSound) soundManager.play(`meow${getRandomInt(1, 3)}.wav`);
+            console.log("\n");
         };
 
         start();

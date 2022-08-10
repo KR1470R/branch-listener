@@ -8,7 +8,7 @@ For instance, when you are working in team and somebody updated main branch, wit
 
 ## Supported Control Version Systems
  - Git
- - Bitbucket *(soon)*
+ - Bitbucket
 
 ## Requirements
 

@@ -1,6 +1,6 @@
 {
   "name": "git-branch-listener",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Listener of git branch reminds of new commits pushed in your specific branch by pushing sound notification. ",
   "main": "index.js",
   "scripts": {
