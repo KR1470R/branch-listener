@@ -85,7 +85,7 @@ export default class ConfigFactory {
                 if (!this.getProperty("workspace")) throw new Error(`${base_template} workspace not found!`);
                 if (!this.getProperty("repo_slug")) throw new Error(`${base_template} Repository slug not found!`);
                 if (!this.getProperty("branch")) throw new Error(`${base_template} Branch not found!`);
-                if (!this.getProperty("access_token")) throw new Error(`${base_template} Access token not found!`);
+                if (!this.getProperty("app_password")) throw new Error(`${base_template} Access token not found!`);
                 break;
             default: throw new Error("Uknown type config!");
         }

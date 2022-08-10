@@ -6,7 +6,6 @@ export class SoundManager {
     constructor() {}
 
     public play(name: string) {
-
         player.play({
             path: `${this.base_path}${name}`
         })

@@ -82,6 +82,7 @@ const quiz_bibucket = (resolve: Function) => {
 
             input.question("Enter app password: ", (answ: any) => {
                 if (!answ) throw new Error("App password is nessessary!");
+                bitbucket_config.setProperty("app_password", answ);
 
                 input.question("Enter workspace name: ", (answ: any) => {
                     if (!answ) throw new Error("Workspace name is necessary!");

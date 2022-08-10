@@ -1,6 +1,6 @@
 {
-	"port": 3001,
-	"timer_interval": 300000,
-	"minutes_difference": 25,
-	"cvs": "bitbucket"
+	"port": 0,
+	"timer_interval": 0,
+	"minutes_difference": 0,
+	"cvs": ""
 }
