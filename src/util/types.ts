@@ -13,10 +13,11 @@ export type ConfigGit = {
 };
 
 export type ConfigBitbucket = {
+    username: string;
+    app_password: string;
     workspace: string;
     repo_slug: string;
     branch: string;
-    access_token: string;
 }
 
 export type Configs = ConfigServer | ConfigGit | ConfigBitbucket;

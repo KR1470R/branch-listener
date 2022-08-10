@@ -12,11 +12,34 @@ export default class BitbucketListener {
         this.config_server = config_server;
         this.axios_config = {
             headers: {
-                "Authorization": `Bearer ${this.config.access_token}`,
                 "Accept": "application/json"
+            },
+            auth: {
+                username: this.config.username,
+                password: this.config.app_password
             }
         };
     }
 
-    public isSoundNewCommit() {}
+    private getGitBranchURL() {
+        return `https://api.bitbucket.org/2.0/repositories/${this.config.workspace}/${this.config.repo_slug}/refs/branches/${this.config.branch}`;
+    }
+
+    private async getBranchData() {
+        return await axios.get(
+            this.getGitBranchURL(),
+            this.axios_config
+        );
+    }
+
+    public async isSoundNewCommit() {
+        try {
+            const branch = await this.getBranchData();
+            console.log("branch:", branch);
+            return Promise.resolve(false);
+        } catch (error) {
+            console.log("BITBUCKET ERROR:", error);
+            return Promise.resolve(false);
+        }
+    }
 }

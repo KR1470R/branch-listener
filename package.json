@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "start-setup": "node ./dist/src/setup.js",
-    "start-listener": "node ./dist/src/index.js"
+    "setup": "node ./dist/src/setup.js",
+    "listener": "node ./dist/src/index.js"
   },
   "repository": {
     "type": "git",

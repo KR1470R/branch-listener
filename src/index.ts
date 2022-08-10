@@ -7,8 +7,8 @@ import {
 import ConfigFactory from "./util/ConfigFactory";
 import { SoundManager } from "./SoundManager";
 import express from "express";
-import GitListener from "GitListener";
-import BitbucketListener from "BitbucketListener";
+import GitListener from "./GitListener";
+import BitbucketListener from "./BitbucketListener";
 import { getRandomInt } from "./util/extra";
 
 const config_server = new ConfigFactory("server", false);
@@ -36,7 +36,7 @@ function listen_new_commit() {
             );
 
         const start = async () => {
-            const isSound = listener.isSoundNewCommit();
+            const isSound = await listener.isSoundNewCommit();
             if (isSound) soundManager.play(`meow${getRandomInt(1, 3)}.wav`);
         };
 
