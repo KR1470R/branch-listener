@@ -8,6 +8,9 @@ export default class JSONManager {
     constructor (path: string) {
         this.path = path;
 
+        if (!fs.existsSync(this.path))
+            fs.writeFileSync(this.path, "{}", {encoding: "utf8"});
+
         this.content = JSON.parse(fs.readFileSync(this.path, {encoding: "utf8", flag: "r"}));
     }
 

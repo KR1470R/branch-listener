@@ -7,9 +7,6 @@ const input = readline.createInterface(stdin, stdout);
 const default_config_server = new ConfigFactory("server", true);
 const config_server = new ConfigFactory("server", false);
 
-const git_config = new ConfigFactory("git");
-const bitbucket_config = new ConfigFactory("bitbucket");
-
 const server_quiz = (resolve: Function) => {
     return new Promise(() => {
         input.question(`Enter port(default ${default_config_server.getProperty("port")}): `, (answ: any) => {
@@ -55,6 +52,7 @@ const server_quiz = (resolve: Function) => {
                                         default_config_server.getProperty("volume")
                                     );
 
+                            config_server.saveAll();
                             resolve(1);
                         });
                     }
@@ -68,6 +66,8 @@ const quiz_git = (resolve: Function) => {
     return new Promise(() => {
         config_server.setProperty("cvs", "git");
 
+        const git_config = new ConfigFactory("git");
+
         input.question("Enter username: ", (answ: any) => {
             if (!answ) throw new Error("Username is nessessary!");
             git_config.setProperty("username", answ);
@@ -80,6 +80,7 @@ const quiz_git = (resolve: Function) => {
                     if (!answ) throw new Error("Branch name is necessary!"); 
                     git_config.setProperty("branch", answ);
 
+                    git_config.saveAll();
                     server_quiz(resolve);
                 });
             });
@@ -90,6 +91,9 @@ const quiz_git = (resolve: Function) => {
 const quiz_bibucket = (resolve: Function) => {
     return new Promise(() => {
         config_server.setProperty("cvs", "bitbucket");
+
+        const bitbucket_config = new ConfigFactory("bitbucket");
+
         input.question("Enter username: ", (answ: any) => {
             if (!answ) throw new Error("Username is nessessary!");
             bitbucket_config.setProperty("username", answ);
@@ -110,6 +114,7 @@ const quiz_bibucket = (resolve: Function) => {
                             if (!answ) throw new Error("Branch name is necessary!"); 
                             bitbucket_config.setProperty("branch", answ);
         
+                            bitbucket_config.saveAll();
                             server_quiz(resolve);
                         });
                     });
@@ -131,15 +136,8 @@ const narroving = () => {
     });
 }
 
-const saveAll = () => {
-    config_server.saveAll();
-    git_config.saveAll();
-    bitbucket_config.saveAll();
-}
-
 narroving()
     .then(res => {
-        saveAll();
         console.log("branch-listener setup has been finished successfully.");
         input.close();
     });
