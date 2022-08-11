@@ -2,7 +2,6 @@ import {
     ConfigServer, 
     ConfigGit, 
     ConfigBitbucket,
-    Configs,
     supportable_configs
 } from "../util/types";
 import JSONManager from "./JSONManager";

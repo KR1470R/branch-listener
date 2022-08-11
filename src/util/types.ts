@@ -4,6 +4,7 @@ export type ConfigServer = {
     port: number;
     timer_interval: number;
     minutes_difference: number;
+    volume: number;
 }
 
 export type ConfigGit = {

@@ -15,8 +15,7 @@ const config_server = new ConfigFactory("server", false);
 config_server.checkValidation();
 const cvs_config = new ConfigFactory(config_server.getProperty("cvs") as supportableCVS);
 cvs_config.checkValidation();
-
-const soundManager = new SoundManager();
+const soundManager = new SoundManager(config_server.getProperty("volume") as number);
 
 console.log(`Running with configs: ${JSON.stringify({
     ...config_server.getAllProperties(),
@@ -38,7 +37,7 @@ function listen_new_commit() {
         const start = async () => {
             const isSound = await listener.isSoundNewCommit();
             console.log("is sound:", isSound);
-            if (isSound) soundManager.play(`meow${getRandomInt(1, 3)}.wav`);
+            if (isSound) soundManager.play(`meow${getRandomInt(1, 3)}.mp3`);
             console.log("\n");
         };
 

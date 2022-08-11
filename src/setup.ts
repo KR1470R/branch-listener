@@ -42,7 +42,21 @@ const server_quiz = (resolve: Function) => {
                                     default_config_server.getProperty("minutes_difference")
                                 );
 
-                        resolve(1);
+                        input.question(`Enter volume sound(default ${default_config_server.getProperty("volume")})`, (answ: any) => {
+                            if (answ) {
+                                if (!(/^\d+$/.test(answ))) 
+                                    throw new Error("Volume must contain only digits! Try again.");
+                                
+                                config_server.setProperty("volume", Number(answ));
+                            } else
+                                config_server
+                                    .setProperty(
+                                        "volume", 
+                                        default_config_server.getProperty("volume")
+                                    );
+
+                            resolve(1);
+                        });
                     }
                 );
             }); 
