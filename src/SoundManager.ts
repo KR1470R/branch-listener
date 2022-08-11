@@ -20,7 +20,7 @@ export class SoundManager {
     }
 
     public play(name: string) {
-        console.log(this.volume)
+        console.log(`Playing ${name} (vol. ${this.volume})`);
         this.player.play(`${this.base_path}${name}`, { mpg123: ["-f", this.volume] });
     }
 }
