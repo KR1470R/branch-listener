@@ -8,7 +8,7 @@ import JSONManager from "./JSONManager";
 
 export default class ConfigFactory {
     
-    private readonly base_path: string = "./configs/";
+    private readonly base_path: string = `${process.env.BRANCH_LISTENER_MAIN_DIR}/configs/`;
     private config_name!: string;
     public type: "git" | "bitbucket" | "server";
     public manager!: JSONManager;

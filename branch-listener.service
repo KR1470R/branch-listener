@@ -1,0 +1,10 @@
+[Unit]
+Description="Git or Bitbucket listener"
+
+[Service]
+Type=simple
+EnvironmentFile=/etc/environment
+ExecStart=/usr/bin/branch-listener-autorun.sh
+
+[Install]
+WantedBy=multi-user.target
