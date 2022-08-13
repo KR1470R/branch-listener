@@ -18,8 +18,8 @@ For instance, when you are working in team and somebody updated main branch, wit
 ## Installation & Configuration
 Beforehand you start the configuration you need provide provide such information for **branch-listener** work properly:
 For git you will need provide: username, repository name and branch name you want listen to;
-For bitbucket: username, app password, workspace name, repository slug and branch name.
-***‼️All your passwords will be stored on your local system without theft‼️***
+For bitbucket: username, app password, workspace name, repository slug and branch name.\
+***‼️All your passwords will be stored on your local system without theft‼️***\
  **Let's start**
  
     git clone https://github.com/KR1470R/branch-listener.git
