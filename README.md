@@ -23,6 +23,7 @@ For bitbucket: username, app password, workspace name, repository slug and branc
  **Let's start**
  
     git clone https://github.com/KR1470R/branch-listener.git
+    npm i
     npm run build
     ./setup.sh
 After you setup **branch-listener**, you will be able to run it:
