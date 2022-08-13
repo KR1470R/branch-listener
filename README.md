@@ -42,4 +42,21 @@ You will need type your system password to configure branch-listener properly.
 Now, branch-listener is running on background via systemd service(**./branch-listener.service**).
 If you need, you can customize branch-listener.service and re-run autorun-setup.sh to keep your changes.
 If you want to update configs, do it manually in *~/.config/branch-listener/configs/* or run `bash ~/.config/branch-listener/setup.sh`
+After config update run this one:
+
+    sudo systemctl restart branch-listener.service
+
 Logs and full working state of branch-listener you can find in *~/.config/branch-listener/logs*.
+
+To check of the branch-listener daemon status:
+
+    sudo systemctl status branch-listener.service
+
+Or to remove totally branch-listener daemon:
+
+    sudo systemctl stop branch-listener.service
+    sudo systemctl disable branch-listener.service
+    sudo rm /etc/systemd/system/branch-listener.service
+    sudo rm /usr/lib/systemd/system/branch-listener.service
+    sudo systemctl daemon-reload
+    sudo systemctl reset-failed
