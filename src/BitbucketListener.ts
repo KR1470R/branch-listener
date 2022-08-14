@@ -26,6 +26,10 @@ export default class BitbucketListener {
         };
     }
 
+    public get branch_name() {
+        return this.config.branch;
+    }
+
     private getGitBranchURL() {
         return `https://api.bitbucket.org/2.0/repositories/${this.config.workspace}/${this.config.repo_slug}/refs/branches/${this.config.branch}`;
     }

@@ -5,10 +5,11 @@ import {
     supportable_configs
 } from "../util/types";
 import JSONManager from "./JSONManager";
+import { getBaseDir } from "./extra";
 
 export default class ConfigFactory {
     
-    private readonly base_path: string = `${process.env.BRANCH_LISTENER_MAIN_DIR}/configs/`;
+    private readonly base_path: string = `${getBaseDir()}configs/`;
     private config_name!: string;
     public type: "git" | "bitbucket" | "server";
     public manager!: JSONManager;

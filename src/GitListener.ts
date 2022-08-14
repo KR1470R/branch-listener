@@ -21,6 +21,10 @@ export default class GitListener {
         this.config_server = config_server;
     }
 
+    public get branch_name() {
+        return this.config.branch;
+    }
+
     private getGitBranchURL() {
         return `https://api.github.com/repos/${this.config.username}/${this.config.repo}/branches/${this.config.branch}`;
     }
