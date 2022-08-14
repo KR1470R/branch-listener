@@ -43,7 +43,7 @@ function listen_new_commit() {
             if (isSound) {
                 soundManager.play(`meow${getRandomInt(1, 3)}.mp3`);
                 notification(
-                    `New commit in ${listener.branch_name})}!`, 
+                    `New commit in ${listener.branch_name}!`, 
                     `Hurry up to pull the ${listener.branch_name}!`
                 );
             }
@@ -72,5 +72,8 @@ function notification(title: string, message: string) {
         sound: false,
         icon: icon_path,
         wait: true
+    }, (err: any, response: any) => {
+        if (err) console.log("NOTIFICATION POPUP ERROR:", err);
+        console.log("response:", response);
     });
 }
