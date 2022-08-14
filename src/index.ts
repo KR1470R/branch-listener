@@ -59,7 +59,8 @@ const app = express();
 
 app.listen(config_server.getProperty("port"), () => {
     console.log(`Listening at ${config_server.getProperty("port")}`);
-    listen_new_commit();
+    // listen_new_commit();
+    notification("test", "test");
 });
 
 function notification(title: string, message: string) {

@@ -5,7 +5,10 @@ export const getRandomInt = (min: number, max: number) => {
 }
 
 export const getBaseDir = () => {
+    console.log("PWD:", process.cwd())
     if (process.cwd() === "/" && process.env.BRANCH_LISTENER_MAIN_DIR)
         return `${process.env.BRANCH_LISTENER_MAIN_DIR}/`;
-    else return `${process.cwd()}/`;
+    else if (process.cwd().endsWith("/branch-listener")) {
+        return `${process.cwd()}/`;
+    } else throw new Error("Wrong working directory!");
 }
