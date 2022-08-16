@@ -83,6 +83,8 @@ export default class GitListener {
                 this.prev_commit === this.current_commit &&
                 this.counter >= 2
             ) return Promise.resolve(false);
+            
+            this.counter++;
 
             return Promise.resolve(true);
         } catch (error: any) {

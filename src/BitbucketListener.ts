@@ -89,6 +89,8 @@ export default class BitbucketListener {
                 this.counter >= 2
             ) return Promise.resolve(false);
 
+            this.counter++;
+
             return Promise.resolve(true);
         } catch (error: any) {
             console.log("BITBUCKET ERROR:", error);
