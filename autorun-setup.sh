@@ -16,21 +16,21 @@ fi
 
 MAIN_DIR="$HOME/.config/branch-listener"
 
+if [ "$(echo "$SHELL" | grep '/zsh')" ]; then
+    SHELL_RC="$HOME/.zshrc"
+elif [ "$(echo "$SHELL" | grep '/bash')" ]; then
+    SHELL_RC="$HOME/.bashrc"
+else 
+    echo "unsupportable shell! exit"
+    return 1
+fi
+
 if ! [ "$(echo "$PATH" | grep "$MAIN_DIR")" ]; then
-    if [ "$(echo "$SHELL" | grep '/zsh')" ]; then
-        SHELL_RC="$HOME/.zshrc"
-    elif [ "$(echo "$SHELL" | grep '/bash')" ]; then
-        SHELL_RC="$HOME/.bashrc"
-    else 
-        echo "unsupportable shell! exit"
-        return 1
-    fi
-    
     export PATH="$PATH":"$MAIN_DIR"
 fi
 
-if ! [ "$(cat $SHELL_RC | grep $MAIN_DIR)" ]; then
-    echo "export PATH=$PATH:$MAIN_DIR" >> "$SHELL_RC"
+if ! [ "$(sudo cat $SHELL_RC | grep $MAIN_DIR)" ]; then
+    echo "export PATH=$PATH:$MAIN_DIR" | tee -a "$SHELL_RC"
 fi
 
 if [ -z "$BRANCH_LISTENER_MAIN_DIR" ]; then
@@ -38,11 +38,10 @@ if [ -z "$BRANCH_LISTENER_MAIN_DIR" ]; then
 fi
 
 if ! [ "$(cat  $SHELL_RC | grep 'BRANCH_LISTENER_MAIN_DIR='$BRANCH_LISTENER_MAIN_DIR)" ]; then
-    echo "export BRANCH_LISTENER_MAIN_DIR=$MAIN_DIR" >> "$SHELL_RC"
+    echo "export BRANCH_LISTENER_MAIN_DIR=$MAIN_DIR" | tee -a "$SHELL_RC"
 fi
 
 if [ -d "$MAIN_DIR" ]; then
-echo suka123
     rm -rf "$MAIN_DIR"
 fi
 
@@ -58,7 +57,7 @@ mkdir "$MAIN_DIR/logs"
 touch "$MAIN_DIR/logs/output.log"
 
 if ! [ "$(cat  $SHELL_RC | grep 'branch-listener-autorun')" ]; then
-    echo "branch-listener-autorun" >> "$SHELL_RC"
+    echo "branch-listener-autorun" | tee -a "$SHELL_RC"
 fi
 
 branch-listener-autorun

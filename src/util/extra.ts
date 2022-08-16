@@ -5,10 +5,12 @@ export const getRandomInt = (min: number, max: number) => {
 }
 
 export const getBaseDir = () => {
-    console.log("PWD:", process.cwd())
-    if (process.cwd() === "/" && process.env.BRANCH_LISTENER_MAIN_DIR)
+    console.log("current dir:", process.cwd());
+    if (!process.env.BRANCH_LISTENER_MAIN_DIR) 
+        throw new Error("Unrecognized branch listener root path! Please, reinstall the program!")
+    if (process.cwd() === "/")
         return `${process.env.BRANCH_LISTENER_MAIN_DIR}/`;
     else if (process.cwd().endsWith("/branch-listener")) {
         return `${process.cwd()}/`;
-    } else throw new Error("Wrong working directory!");
+    } else return `${process.env.BRANCH_LISTENER_MAIN_DIR}/`;
 }
