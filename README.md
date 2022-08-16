@@ -1,20 +1,41 @@
+<center>
+	<strong>
+		<h1>branch-listener</h1>
+	</strong>
+</center>
+<p align="center">
+  <a aria-label="branch-listener version">
+    <img alt="" src="https://badgen.net/badge/branch-listener/4.0.0/green">
+  </a>
+  <a aria-label="Node.js version">
+    <img alt="" src="https://badgen.net/badge/node/>=18/green">
+  </a>
+  <a aria-label="NPM version">
+    <img alt="" src="https://badgen.net/badge/npm/>=8.17/purple">
+  </a>
+  <a aria-label="Typescript version">
+    <img alt="" src="https://badgen.net/badge/typescript/>=4/blue">
+  </a>
+  <a aria-label="Axios version">
+    <img alt="" src="https://badgen.net/badge/axios/>=4/yellow">
+  </a>
+  <a aria-label="Express version">
+    <img alt="" src="https://badgen.net/badge/express/>=4.18/red">
+  </a>
+    <a aria-label="Zsh/bash">
+    <img alt="" src="https://badgen.net/badge/bash/zsh/black">
+  </a>
+</p>
 
-# branch-listener
 The branch-listener will notify you for a new commit of your repository of the branch that you've specified.
 If new commit is pushed, it will sound by a catty meow two times.
 ## Why do you need it?
 For instance, when you are working in team and somebody updated main branch, with **branch-listener** you will get notification and you will be aware of it. So you will be able pull remote changes to your working branch on time, thus there will be no any conflicts of merging your working branch to main branch.
 ## Supported Control Version Systems
- - Git
- - Bitbucket
+ <img alt="" src="https://img.shields.io/badge/git-%23F05033.svg?style=for-the-badge&logo=git&logoColor=white"> <img alt="" src="https://img.shields.io/badge/bitbucket-%230047B3.svg?style=for-the-badge&logo=bitbucket&logoColor=white">
 ## Supported Systems
-**Linux only**
-## Requirements
- - Node.js >= 18;
- - TypeScript >= 4;
- - Axios >= 0.27.0;
- - Express >= 4.18.0;
- - zsh/bash
+<img alt="" src="https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black">
+
 ## Installation & Configuration
 Beforehand you start the configuration you need provide provide such information for **branch-listener** work properly:
 For git you will need provide: username, repository name and branch name you want listen to;
@@ -42,3 +63,6 @@ For such purpose, you can make autorun of the branch-listener on startup system.
 
     ./autorun-setup.sh
 Now, branch-listener is running on background on port 3001 or which you was specified in installation and it will be running at startup system and will notify you about new commits!
+
+## License
+<img alt="" src="https://camo.githubusercontent.com/982edb824038d4ed388cf47101d10d06c1e9e5cc2b23b32a15ead6185e35430e/68747470733a2f2f7777772e676e752e6f72672f67726170686963732f67706c76332d6f722d6c617465722e706e67">
