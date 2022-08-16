@@ -1,11 +1,15 @@
 import axios from "axios";
-import { ConfigGit, ConfigServer } from "./util/types";
+import { 
+    ConfigGit, 
+    ConfigServer,
+    Listener
+} from "./util/types";
 
-export default class GitListener {
+export default class GitListener implements Listener {
 
-    private config: ConfigGit;
-    private config_server: ConfigServer; 
-    private readonly axios_config: object = {
+    public config: ConfigGit;
+    public config_server: ConfigServer; 
+    public readonly axios_config: object = {
         headers: {
             "Content-Type": "application/vnd.github+json",
             "Access-Control-Allow-Origin": "*",

@@ -2,7 +2,8 @@ import {
     ConfigServer,
     ConfigGit,
     ConfigBitbucket,
-    supportableCVS
+    supportableCVS,
+    Listener
 } from "./util/types";
 import ConfigFactory from "./util/ConfigFactory";
 import { SoundManager } from "./SoundManager";
@@ -27,7 +28,7 @@ console.log(`Running with configs: ${JSON.stringify({
 
 function listen_new_commit() {
     return new Promise(resolve => {
-        const listener = config_server.getProperty("cvs") === "git" ? 
+        const listener: Listener = config_server.getProperty("cvs") === "git" ? 
             new GitListener(
                 cvs_config.getAllProperties() as ConfigGit,
                 config_server.getAllProperties() as ConfigServer 

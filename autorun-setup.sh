@@ -29,7 +29,7 @@ if ! [ "$(echo "$PATH" | grep "$MAIN_DIR")" ]; then
     export PATH="$PATH":"$MAIN_DIR"
 fi
 
-if ! [ "$(sudo cat $SHELL_RC | grep $MAIN_DIR)" ]; then
+if ! [ "$(cat $SHELL_RC | grep $MAIN_DIR)" ]; then
     echo "export PATH=$PATH:$MAIN_DIR" | tee -a "$SHELL_RC"
 fi
 

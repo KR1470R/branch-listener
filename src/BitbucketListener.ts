@@ -1,11 +1,15 @@
 import axios, { AxiosRequestConfig } from "axios";
-import { ConfigBitbucket, ConfigServer } from "./util/types";
+import { 
+    ConfigBitbucket, 
+    ConfigServer,
+    Listener 
+} from "./util/types";
 
-export default class BitbucketListener {
+export default class BitbucketListener implements Listener {
     
-    private config: ConfigBitbucket;
-    private config_server: ConfigServer; 
-    private axios_config: object;
+    public config: ConfigBitbucket;
+    public config_server: ConfigServer; 
+    public readonly axios_config: object;
     private counter: number = 0;
     private prev_commit!: string;
     private current_commit!: string;
