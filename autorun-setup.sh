@@ -10,9 +10,7 @@ if ! [ -d ./dist ]; then
     return 1
 fi
 
-if [ "$(lsof -t -i:3001 -sTCP:LISTEN)" ]; then
-    kill -9 "$(lsof -t -i:3001 -sTCP:LISTEN)"
-fi
+bash ./kill-listener.sh
 
 MAIN_DIR="$HOME/.config/branch-listener"
 
