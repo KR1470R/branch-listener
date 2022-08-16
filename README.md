@@ -1,11 +1,11 @@
-<center>
+<p align="center">
 	<strong>
-		<h1>branch-listener</h1>
+		<h1 align="center">branch-listener</h1>
 	</strong>
-</center>
+</p>
 <p align="center">
   <a aria-label="branch-listener version">
-    <img alt="" src="https://badgen.net/badge/branch-listener/4.0.0/green">
+    <img alt="" src="https://badgen.net/badge/branch-listener/4.0.0/grey">
   </a>
   <a aria-label="Node.js version">
     <img alt="" src="https://badgen.net/badge/node/>=18/green">
@@ -16,16 +16,22 @@
   <a aria-label="Typescript version">
     <img alt="" src="https://badgen.net/badge/typescript/>=4/blue">
   </a>
-  <a aria-label="Axios version">
-    <img alt="" src="https://badgen.net/badge/axios/>=4/yellow">
-  </a>
-  <a aria-label="Express version">
-    <img alt="" src="https://badgen.net/badge/express/>=4.18/red">
-  </a>
-    <a aria-label="Zsh/bash">
-    <img alt="" src="https://badgen.net/badge/bash/zsh/black">
-  </a>
 </p>
+<p align="center">
+	<a aria-label="Axios version">
+	    <img alt="" src="https://badgen.net/badge/axios/>=4/pink">
+	  </a>
+	  <a aria-label="Express version">
+	    <img alt="" src="https://badgen.net/badge/express/>=4.18/red">
+	  </a>
+	    <a aria-label="Zsh/bash">
+	    <img alt="" src="https://badgen.net/badge/bash/zsh/black">
+	  </a>
+	  </a>
+	    <a aria-label="Linux">
+	    <img alt="" src="https://badgen.net/badge/linux/any//yellow">
+	  </a>
+  </p>
 
 The branch-listener will notify you for a new commit of your repository of the branch that you've specified.
 If new commit is pushed, it will sound by a catty meow two times.
@@ -33,8 +39,6 @@ If new commit is pushed, it will sound by a catty meow two times.
 For instance, when you are working in team and somebody updated main branch, with **branch-listener** you will get notification and you will be aware of it. So you will be able pull remote changes to your working branch on time, thus there will be no any conflicts of merging your working branch to main branch.
 ## Supported Control Version Systems
  <img alt="" src="https://img.shields.io/badge/git-%23F05033.svg?style=for-the-badge&logo=git&logoColor=white"> <img alt="" src="https://img.shields.io/badge/bitbucket-%230047B3.svg?style=for-the-badge&logo=bitbucket&logoColor=white">
-## Supported Systems
-<img alt="" src="https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black">
 
 ## Installation & Configuration
 Beforehand you start the configuration you need provide provide such information for **branch-listener** work properly:
