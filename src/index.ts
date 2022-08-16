@@ -74,6 +74,5 @@ function notification(title: string, message: string) {
         wait: true
     }, (err: any, response: any) => {
         if (err) console.log("NOTIFICATION POPUP ERROR:", err);
-        console.log("response:", response);
     });
 }
