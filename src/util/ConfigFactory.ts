@@ -74,6 +74,8 @@ export default class ConfigFactory {
                 if (!this.getProperty("cvs")) throw new Error(`${base_template} Control version system not found!`);
                 if (!this.getProperty("port")) throw new Error(`${base_template} Port not found!`)
                 if (!this.getProperty("timer_interval")) throw new Error(`${base_template} Timer interval not found!`)
+                if (Number(this.getProperty("timer_interval")) < 60000)
+                    throw new Error("Timer must be larger or equal 60s. Please increase it!");
                 if (!this.getProperty("minutes_difference")) throw new Error(`${base_template} Minutes difference not found!`)
                 break;
             case "git":

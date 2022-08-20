@@ -20,6 +20,9 @@ const server_quiz = (resolve: Function) => {
                 if (answ) {
                     if (!(/^\d+$/.test(answ))) 
                         throw new Error("Timer must contain only digits! Try again.");
+                    if (answ < 60000)
+                        throw new Error("Timer must be larger or equal 60s. Please increase it!");
+
                     config_server.setProperty("timer_interval", Number(answ));
                 } else
                     config_server
