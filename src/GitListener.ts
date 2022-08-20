@@ -82,6 +82,7 @@ export default class GitListener implements Listener {
             console.log("current_commit:", this.current_commit);
             console.log("prev commit:", this.prev_commit);
             console.log("counter:", this.counter);
+            
             if (this.current_commit !== this.prev_commit) {
                 this.prev_commit = this.current_commit;
                 this.counter = 0;
