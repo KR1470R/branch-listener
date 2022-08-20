@@ -44,7 +44,8 @@ If new commit is pushed, it will sound by a catty meows.
 3. [Installation and Configuration][3]
     1) [Automation][3.1]
 4. [Request rate-limits of CVS][4]
-4. [License][5]
+5. [License][5]
+6. [To do][6]
 
 ## Why do you need it?
 For instance, when you are working in team and somebody updated main branch, with **branch-listener** you will get notification and you will be aware of it. So you will be able pull remote changes to your working branch on time, thus there will be no any conflicts of merging your working branch to main branch.
@@ -101,9 +102,14 @@ After this you will be able to use **branch-listener** as util:
 ## License
 <img alt="" src="https://camo.githubusercontent.com/982edb824038d4ed388cf47101d10d06c1e9e5cc2b23b32a15ead6185e35430e/68747470733a2f2f7777772e676e752e6f72672f67726170686963732f67706c76332d6f722d6c617465722e706e67">
 
+## To do
+ 1. Add compatibility for Gitlab;
+ 2. Add multi listeners;
+
 [1]:https://github.com/KR1470R/branch-listener#why-do-you-need-it
 [2]:https://github.com/KR1470R/branch-listener#supported-control-version-systems
 [3]:https://github.com/KR1470R/branch-listener#installation-and-configuration
 [3.1]:https://github.com/KR1470R/branch-listener#automation
 [4]:https://github.com/KR1470R/branch-listener#request-rate-limits-of-cvs
 [5]:https://github.com/KR1470R/branch-listener#license
+[6]:https://github.com/KR1470R/branch-listener#to-do
