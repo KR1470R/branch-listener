@@ -1,0 +1,87 @@
+#!/bin/bash
+LOG_FOLDER=$BRANCH_LISTENER_MAIN_DIR/logs
+LOG_FILE=output.log
+
+function log() {
+    local message="$1"
+    
+    echo "$message"
+    echo "$message" &>> "$LOG_FOLDER/$LOG_FILE" &
+}
+
+function start_listener {
+    log "*** LISTENER LOGS ***"
+
+    if ! [ -d "$BRANCH_LISTENER_MAIN_DIR" ]; then
+        log "main dir($BRANCH_LISTENER_MAIN_DIR) not found! you need setup branch-listener properly!";
+        exit 1;
+    fi
+
+    if ! [ -d "$BRANCH_LISTENER_MAIN_DIR/dist" ]; then
+        log "src folder not found! Please build branch-listener.";
+        exit 1;
+    fi
+
+    if ! [ -f "$LOG_FOLDER/$LOG_FILE" ]; then
+        mkdir "$LOG_FOLDER";
+        touch "$LOG_FOLDER/$LOG_FILE";
+    fi
+
+    local index_path="$BRANCH_LISTENER_MAIN_DIR/dist/src/index.js"
+    nohup node "$index_path" &>> "$LOG_FOLDER/$LOG_FILE" &
+}
+
+function kill_listener {
+    log "*** KILLING LISTENER LOGS ***"
+
+    log "checking is listener alive..."
+    if [ "$(lsof -t -i:3001 -sTCP:LISTEN)" ]; then
+        kill -9 "$(lsof -t -i:3001 -sTCP:LISTEN)"
+        log "listener has been killed"
+    else 
+        log "listener is not alive at 3001"
+    fi 
+}
+
+function restart_listener {
+    kill_listener 
+    start_listener
+}
+
+function setup_listener {
+    log "*** SETUP LISTENER LOGS ***"
+
+    local setup_path="$BRANCH_LISTENER_MAIN_DIR/dist/src/setup.js"
+    node "$setup_path"
+}
+
+function help_usage {
+    log "Usage: branch-listener start | restart | kill | setup | help"
+    log '     start          Run listener on your port(default 3001)'
+    log '     restart        Restart listener'
+    log '     kill           Turn off listener'
+    log '     setup          Configure configs of listener'
+    log '     help           Show this page'
+    return 0
+}
+
+function narrowing() {
+    parameter="$1"
+
+    if [ "$parameter" = "start" ]; then
+        start_listener
+    elif [ "$parameter" = "restart" ]; then
+        restart_listener
+    elif [ "$parameter" = "kill" ]; then
+        kill_listener
+    elif [ "$parameter" = "setup" ]; then
+        setup_listener
+    elif [ "$parameter" = "help" ]; then
+        help_usage
+    else
+        log "uknown parameter!"
+        exit 1
+    fi
+}
+
+narrowing "$1"

@@ -48,17 +48,15 @@ cp -r ./dist/* "$MAIN_DIR/dist"
 cp -r  ./configs "$MAIN_DIR"
 cp -r ./node_modules "$MAIN_DIR"
 cp -r ./assets "$MAIN_DIR"
-cp ./start-listener.sh "$MAIN_DIR"
-cp ./restart-listener.sh "$MAIN_DIR"
-cp ./setup.sh "$MAIN_DIR"
+cp ./branch-listener "$MAIN_DIR"
 mkdir "$MAIN_DIR/logs"
 touch "$MAIN_DIR/logs/output.log"
 
-if ! [ "$(cat  $SHELL_RC | grep 'branch-listener-autorun')" ]; then
-    echo "branch-listener-autorun" | tee -a "$SHELL_RC"
+if ! [ "$(cat  $SHELL_RC | grep 'branch-listener start')" ]; then
+    echo "branch-listener start" | tee -a "$SHELL_RC"
 fi
 
-branch-listener-autorun
+branch-listener start
 
 echo "autorun of branch-listener configured successfully.";
 return 0
