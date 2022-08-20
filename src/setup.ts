@@ -39,7 +39,7 @@ const server_quiz = (resolve: Function) => {
                                     default_config_server.getProperty("minutes_difference")
                                 );
 
-                        input.question(`Enter volume sound(default ${default_config_server.getProperty("volume")})`, (answ: any) => {
+                        input.question(`Enter volume sound(default ${default_config_server.getProperty("volume")}): `, (answ: any) => {
                             if (answ) {
                                 if (!(/^\d+$/.test(answ))) 
                                     throw new Error("Volume must contain only digits! Try again.");
