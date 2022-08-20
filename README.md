@@ -41,7 +41,7 @@ If new commit is pushed, it will sound by a catty meows.
 
 1. [Why do you need it? ][1]
 2. [Supported Control Version Systems][2]
-3. [Installation & Configuration][3]
+3. [Installation and Configuration][3]
     1) [Automation][3.1]
 4. [Request rate-limits of CVS][4]
 4. [License][5]
