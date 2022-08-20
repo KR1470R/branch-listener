@@ -56,7 +56,7 @@ For instance, when you are working in team and somebody updated main branch, wit
 </a>
 
 
-## Installation & Configuration
+## Installation and Configuration
 Beforehand you start the configuration you need provide provide such information for **branch-listener** work properly:
 For git you will need provide: username, repository name and branch name you want listen to;
 For bitbucket: username, app password, workspace name, repository slug and branch name.\
@@ -103,7 +103,7 @@ After this you will be able to use **branch-listener** as util:
 
 [1]:https://github.com/KR1470R/branch-listener#why-do-you-need-it
 [2]:https://github.com/KR1470R/branch-listener#supported-control-version-systems
-[3]:https://github.com/KR1470R/branch-listener#installation-&-configuration
+[3]:https://github.com/KR1470R/branch-listener#installation-and-configuration
 [3.1]:https://github.com/KR1470R/branch-listener#automation
 [4]:https://github.com/KR1470R/branch-listener#request-rate-limits-of-cvs
 [5]:https://github.com/KR1470R/branch-listener#license
