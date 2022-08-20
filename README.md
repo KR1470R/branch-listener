@@ -73,6 +73,10 @@ For such purpose, you can make autorun of the branch-listener on startup system.
     ./autorun-setup.sh
 Now, branch-listener is running on background on port 3001 or which you was specified in installation and it will be running at startup system and will notify you about new commits!
 
+## Request rate-limits of CVS
+| CVS | <img alt="" src="https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white">	| <img alt="" src="https://img.shields.io/badge/bitbucket-%230047B3.svg?style=for-the-badge&logo=bitbucket&logoColor=white"> | 	
+|-------------------------|-------|----|
+| Requests per-hour limit | 5,000 | 60 |
 
 ## License
 <img alt="" src="https://camo.githubusercontent.com/982edb824038d4ed388cf47101d10d06c1e9e5cc2b23b32a15ead6185e35430e/68747470733a2f2f7777772e676e752e6f72672f67726170686963732f67706c76332d6f722d6c617465722e706e67">
