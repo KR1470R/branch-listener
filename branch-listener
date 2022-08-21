@@ -4,9 +4,15 @@ LOG_FILE=output.log
 
 function log() {
     local message="$1"
-    
+    local save_to_logs="$2"
+    if [ -z "$2" ]; then
+        save_to_logs=true
+    fi
+
     echo "$message"
-    echo "$message" &>> "$LOG_FOLDER/$LOG_FILE" &
+    if [ "$save_to_logs" = true ]; then
+        echo "$message" &>> "$LOG_FOLDER/$LOG_FILE" &
+    fi
 }
 
 function start_listener {
@@ -32,14 +38,15 @@ function start_listener {
 }
 
 function kill_listener {
-    log "*** KILLING LISTENER LOGS ***"
+    isLog=$1
+    log "*** KILLING LISTENER LOGS ***" "$isLog"
 
-    log "checking is listener alive..."
+    log "checking is listener alive..." "$isLog"
     if [ "$(lsof -t -i:3001 -sTCP:LISTEN)" ]; then
         kill -9 "$(lsof -t -i:3001 -sTCP:LISTEN)"
-        log "listener has been killed"
+        log "listener has been killed" "$isLog"
     else 
-        log "listener is not alive at 3001"
+        log "listener is not alive at 3001" "$isLog"
     fi 
 }
 
@@ -92,6 +99,8 @@ function uninstall_listener {
     unset BRANCH_LISTENER_SHELL_RC
     unset LOG_FOLDER
     unset LOG_FILE
+
+    kill_listener false
 }
 
 function help_usage {
