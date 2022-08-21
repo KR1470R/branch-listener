@@ -1,4 +1,5 @@
 
+
 <p align="center">
 	<strong>
 		<h1 align="center">branch-listener</h1>
@@ -6,7 +7,7 @@
 </p>
 <p align="center">
   <a aria-label="branch-listener version">
-    <img alt="" src="https://badgen.net/badge/branch-listener/5.0.0/grey">
+    <img alt="" src="https://badgen.net/badge/branch-listener/5.1.0/grey">
   </a>
   <a aria-label="Node.js version">
     <img alt="" src="https://badgen.net/badge/node/>=18/green">
@@ -43,9 +44,10 @@ If new commit is pushed, it will sound by a catty meows.
 2. [Supported Control Version Systems][2]
 3. [Installation and Configuration][3]
     1) [Automation][3.1]
-4. [CVS Request requirements][4]
-5. [License][5]
-6. [To do][6]
+4. [Uninstall][4]
+5. [CVS Request requirements][5]
+6. [License][6]
+7. [To do][7]
 
 ## Why do you need it?
 For instance, when you are working in team and somebody updated main branch, with **branch-listener** you will get notification and you will be aware of it. So you will be able pull remote changes to your working branch on time, thus there will be no any conflicts of merging your working branch to main branch.
@@ -86,13 +88,18 @@ For such purpose, you can make autorun of the branch-listener on startup system.
 Now, branch-listener is running on background on port 3001 or which you was specified in installation and it will be running at startup system and will notify you about new commits!
 After this you will be able to use **branch-listener** as util:
 
-    Usage: branch-listener start | restart | kill | setup | help
+    Usage: branch-listener start | restart | kill | setup| uninstall | help
          start          Run listener on your port(default 3001)
          restart        Restart listener
          kill           Turn off listener
          setup          Configure configs of listener
+         uninstall      Totally uninstall branch-listener
          help           Show this page
 
+## Uninstall
+To uninstall branch-listener and remove all configs and settings: 
+
+    branch-listener uninstall
 
 ## CVS Request requirements
 | CVS | <img alt="" src="https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white">	| <img alt="" src="https://img.shields.io/badge/bitbucket-%230047B3.svg?style=for-the-badge&logo=bitbucket&logoColor=white"> | 	
@@ -110,6 +117,7 @@ After this you will be able to use **branch-listener** as util:
 [2]:https://github.com/KR1470R/branch-listener#supported-control-version-systems
 [3]:https://github.com/KR1470R/branch-listener#installation-and-configuration
 [3.1]:https://github.com/KR1470R/branch-listener#automation
-[4]:https://github.com/KR1470R/branch-listener#cvs-request-requirements
-[5]:https://github.com/KR1470R/branch-listener#license
-[6]:https://github.com/KR1470R/branch-listener#to-do
+[4]:https://github.com/KR1470R/branch-listener#uninstall
+[5]:https://github.com/KR1470R/branch-listener#cvs-request-requirements
+[6]:https://github.com/KR1470R/branch-listener#license
+[7]:https://github.com/KR1470R/branch-listener#to-do

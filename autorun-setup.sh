@@ -15,28 +15,32 @@ bash ./branch-listener kill
 MAIN_DIR="$HOME/.config/branch-listener"
 
 if [ "$(echo "$SHELL" | grep '/zsh')" ]; then
-    SHELL_RC="$HOME/.zshrc"
+    BRANCH_LISTENER_SHELL_RC="$HOME/.zshrc"
 elif [ "$(echo "$SHELL" | grep '/bash')" ]; then
-    SHELL_RC="$HOME/.bashrc"
+    BRANCH_LISTENER_SHELL_RC="$HOME/.bashrc"
 else 
     echo "unsupportable shell! exit"
     return 1
+fi
+
+if ! [ "$(cat $BRANCH_LISTENER_SHELL_RC | grep BRANCH_LISTENER_SHELL_RC=)" ]; then
+    echo 'export BRANCH_LISTENER_SHELL_RC='"$BRANCH_LISTENER_SHELL_RC" | tee -a "$BRANCH_LISTENER_SHELL_RC"
 fi
 
 if ! [ "$(echo "$PATH" | grep "$MAIN_DIR")" ]; then
     export PATH="$PATH":"$MAIN_DIR"
 fi
 
-if ! [ "$(cat $SHELL_RC | grep $MAIN_DIR)" ]; then
-    echo 'export PATH=$PATH:'"$MAIN_DIR" | tee -a "$SHELL_RC"
+if ! [ "$(cat $BRANCH_LISTENER_SHELL_RC | grep $MAIN_DIR)" ]; then
+    echo 'export PATH=$PATH:'"$MAIN_DIR" | tee -a "$BRANCH_LISTENER_SHELL_RC"
 fi
 
 if [ -z "$BRANCH_LISTENER_MAIN_DIR" ]; then
     export BRANCH_LISTENER_MAIN_DIR="$MAIN_DIR"
 fi
 
-if ! [ "$(cat  $SHELL_RC | grep 'BRANCH_LISTENER_MAIN_DIR='$BRANCH_LISTENER_MAIN_DIR)" ]; then
-    echo "export BRANCH_LISTENER_MAIN_DIR=$MAIN_DIR" | tee -a "$SHELL_RC"
+if ! [ "$(cat  $BRANCH_LISTENER_SHELL_RC | grep 'BRANCH_LISTENER_MAIN_DIR='$BRANCH_LISTENER_MAIN_DIR)" ]; then
+    echo "export BRANCH_LISTENER_MAIN_DIR=$MAIN_DIR" | tee -a "$BRANCH_LISTENER_SHELL_RC"
 fi
 
 if [ -d "$MAIN_DIR" ]; then
@@ -52,8 +56,8 @@ cp ./branch-listener "$MAIN_DIR"
 mkdir "$MAIN_DIR/logs"
 touch "$MAIN_DIR/logs/output.log"
 
-if ! [ "$(cat  $SHELL_RC | grep 'branch-listener start')" ]; then
-    echo 'if [ $TERM = "linux" ]; then branch-listener start; fi' | tee -a "$SHELL_RC"
+if ! [ "$(cat  $BRANCH_LISTENER_SHELL_RC | grep 'branch-listener start')" ]; then
+    echo 'if [ $TERM = "linux" ]; then branch-listener start; fi' | tee -a "$BRANCH_LISTENER_SHELL_RC"
 fi
 
 branch-listener start

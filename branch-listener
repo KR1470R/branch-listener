@@ -55,12 +55,52 @@ function setup_listener {
     node "$setup_path"
 }
 
+function uninstall_listener {
+    if [ -n "$BRANCH_LISTENER_SHELL_RC" ]; then
+        echo "cannot find registered shell rc, trying to defind..."
+        if echo "$SHELL" | grep -q 'zsh'; then
+            BRANCH_LISTENER_SHELL_RC="$HOME/.zshrc"
+        elif echo "$SHELL" | grep -q 'bash'; then
+            BRANCH_LISTENER_SHELL_RC="$HOME/.bashrc"
+        else 
+            echo "unsupportable shell! exit"
+            exit 1
+        fi
+
+        echo "defined $BRANCH_LISTENER_SHELL_RC"
+    fi
+
+    if  cat "$BRANCH_LISTENER_SHELL_RC" | grep -q "export BRANCH_LISTENER_SHELL_RC="; then
+        sed -i "s|export BRANCH_LISTENER_SHELL_RC=$BRANCH_LISTENER_SHELL_RC||g" "$BRANCH_LISTENER_SHELL_RC"
+    fi
+
+    if cat "$BRANCH_LISTENER_SHELL_RC" | grep -q "export BRANCH_LISTENER_MAIN_DIR="; then
+        sed -i "s|export BRANCH_LISTENER_MAIN_DIR=$BRANCH_LISTENER_MAIN_DIR||g" "$BRANCH_LISTENER_SHELL_RC"
+    fi
+
+    if cat "$BRANCH_LISTENER_SHELL_RC" | grep -q "branch-listener start"; then
+        sed -i '/branch-listener start/d' "$BRANCH_LISTENER_SHELL_RC"
+    fi
+
+    if cat "$BRANCH_LISTENER_SHELL_RC" | grep -q 'export PATH=$PATH:'"$BRANCH_LISTENER_MAIN_DIR"; then
+        sed -i -e "s|export PATH=\$PATH:$BRANCH_LISTENER_MAIN_DIR||g" "$BRANCH_LISTENER_SHELL_RC"
+    fi
+
+    rm -rf "$BRANCH_LISTENER_MAIN_DIR"
+
+    unset BRANCH_LISTENER_MAIN_DIR
+    unset BRANCH_LISTENER_SHELL_RC
+    unset LOG_FOLDER
+    unset LOG_FILE
+}
+
 function help_usage {
-    log "Usage: branch-listener start | restart | kill | setup | help"
+    log "Usage: branch-listener start | restart | kill | setup | uninstall | help"
     log '     start          Run listener on your port(default 3001)'
     log '     restart        Restart listener'
     log '     kill           Turn off listener'
     log '     setup          Configure configs of listener'
+    log '     uninstall      Totally uninstall branch-listener'
     log '     help           Show this page'
     return 0
 }
@@ -76,6 +116,8 @@ function narrowing() {
         kill_listener
     elif [ "$parameter" = "setup" ]; then
         setup_listener
+    elif [ "$parameter" = "uninstall" ]; then
+        uninstall_listener
     elif [ "$parameter" = "help" ]; then
         help_usage
     else
