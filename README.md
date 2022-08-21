@@ -61,7 +61,7 @@ So you will be able pull remote changes to your working branch on time, thus the
 
 
 ## Installation and Configuration
-Beforehand you start the configuration you need provide provide such information for **branch-listener** work properly:
+Beforehand you start the configuration you need to provide such information for **branch-listener** work properly:
 For git you will need provide: username, repository name and branch name you want listen to;\
 For bitbucket: username, app password, workspace name, repository slug and branch name.\
 ***‼️All your passwords will be stored on your local system without theft‼️***\
