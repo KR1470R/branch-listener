@@ -10,7 +10,7 @@ if ! [ -d ./dist ]; then
     return 1
 fi
 
-bash ./kill-listener.sh
+bash ./branch-listener kill
 
 MAIN_DIR="$HOME/.config/branch-listener"
 
@@ -28,7 +28,7 @@ if ! [ "$(echo "$PATH" | grep "$MAIN_DIR")" ]; then
 fi
 
 if ! [ "$(cat $SHELL_RC | grep $MAIN_DIR)" ]; then
-    echo "export PATH=$PATH:$MAIN_DIR" | tee -a "$SHELL_RC"
+    echo 'export PATH=$PATH:'"$MAIN_DIR" | tee -a "$SHELL_RC"
 fi
 
 if [ -z "$BRANCH_LISTENER_MAIN_DIR" ]; then
@@ -53,7 +53,7 @@ mkdir "$MAIN_DIR/logs"
 touch "$MAIN_DIR/logs/output.log"
 
 if ! [ "$(cat  $SHELL_RC | grep 'branch-listener start')" ]; then
-    echo "branch-listener start" | tee -a "$SHELL_RC"
+    echo 'if [ $TERM = "linux" ]; then branch-listener start; fi' | tee -a "$SHELL_RC"
 fi
 
 branch-listener start
