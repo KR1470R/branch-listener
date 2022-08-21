@@ -35,8 +35,8 @@
 	  </a>
   </p>
 
-The branch-listener will notify you for a new commit of your repository of the branch that you've specified.
-If new commit is pushed, it will sound by a catty meows.
+The branch-listener will notify you for a new commit of your repository of the branch that you've specified.\
+If new commit is pushed, it will push a notification.\
 
 ## Content
 
@@ -50,7 +50,8 @@ If new commit is pushed, it will sound by a catty meows.
 7. [To do][7]
 
 ## Why do you need it?
-For instance, when you are working in team and somebody updated main branch, with **branch-listener** you will get notification and you will be aware of it. So you will be able pull remote changes to your working branch on time, thus there will be no any conflicts of merging your working branch to main branch.
+For instance, when you are working in team and somebody updated main branch, with **branch-listener** you will get notification and you will be aware of it.\
+So you will be able pull remote changes to your working branch on time, thus there will be no any conflicts of merging your working branch to main branch.
 ## Supported Control Version Systems
 <a href="https://github.com">
   <img alt="" src="https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white">
@@ -61,7 +62,7 @@ For instance, when you are working in team and somebody updated main branch, wit
 
 ## Installation and Configuration
 Beforehand you start the configuration you need provide provide such information for **branch-listener** work properly:
-For git you will need provide: username, repository name and branch name you want listen to;
+For git you will need provide: username, repository name and branch name you want listen to;\
 For bitbucket: username, app password, workspace name, repository slug and branch name.\
 ***‼️All your passwords will be stored on your local system without theft‼️***\
  **Let's start**
@@ -73,19 +74,19 @@ For bitbucket: username, app password, workspace name, repository slug and branc
 After you setup **branch-listener**, you will be able to run it:
 
     ./branch-listener start
-Here we go, now the branch-listener will notify you for every commit has been pushed.
-Logs and full-working state of branch-listener you can find in *./logs/*.
-You may update configs manually in *./configs/*, or just run `./branch-listener setup`.
+Here we go, now the branch-listener will notify you for every commit has been pushed.\
+Logs and full-working state of branch-listener you can find in *./logs/*.\
+You may update configs manually in *./configs/*, or just run `./branch-listener setup`.\
 If you've changed configs or source code(don't forget **rebuild** the project!), you must run this script:
 
     ./branch-listener restart
 
 ## Automation
-Only after you have installed it, you may need run it in background and on autostartup your system.
-For such purpose, you can make autorun of the branch-listener on startup system.
+Only after you have installed it, you may need run it in background and on autostartup your system.\
+For such purpose, you can make autorun of the branch-listener on startup system.\
 
     ./autorun-setup.sh
-Now, branch-listener is running on background on port 3001 or which you was specified in installation and it will be running at startup system and will notify you about new commits!
+Now, branch-listener is running on background on port 3001 or which you was specified in installation and it will be running at startup system and will notify you about new commits!\
 After this you will be able to use **branch-listener** as util:
 
     Usage: branch-listener start | restart | kill | setup| uninstall | help
