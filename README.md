@@ -36,7 +36,7 @@
   </p>
 
 The branch-listener will notify you for a new commit of your repository of the branch that you've specified.\
-If new commit is pushed, it will push a notification.\
+If new commit is pushed, it will push a notification.
 
 ## Content
 
@@ -83,7 +83,7 @@ If you've changed configs or source code(don't forget **rebuild** the project!),
 
 ## Automation
 Only after you have installed it, you may need run it in background and on autostartup your system.\
-For such purpose, you can make autorun of the branch-listener on startup system.\
+For such purpose, you can make autorun of the branch-listener on startup system.
 
     ./autorun-setup.sh
 Now, branch-listener is running on background on port 3001 or which you was specified in installation and it will be running at startup system and will notify you about new commits!\
