@@ -3,7 +3,10 @@ LOG_FOLDER="$BRANCH_LISTENER_MAIN_DIR/logs"
 LOG_FILE=output.log
 
 function check_perfomance {
-    BRANCH_LISTENER_PORT=$(cat "$BRANCH_LISTENER_MAIN_DIR"/configs/server/config.json | jq -r ".port")
+    if [ -z "$BRANCH_LISTENER_MAIN_DIR" ] && [ -f "$BRANCH_LISTENER_MAIN_DIR"/configs/server/config.json ]; then
+        BRANCH_LISTENER_PORT=$(cat "$BRANCH_LISTENER_MAIN_DIR"/configs/server/config.json | jq -r ".port")
+    fi
+
     if [ -z "$BRANCH_LISTENER_PORT" ]; then
         echo "branch-listener port is not defined. please reinstall or setup in correctly!"
         exit 1
@@ -18,7 +21,7 @@ function log() {
     fi
 
     echo "$message"
-    if [ "$save_to_logs" = true ] && [ -z "$BRANCH_LISTENER_MAIN_DIR" ]; then
+    if [ "$save_to_logs" = true ] && [ -z "$BRANCH_LISTENER_MAIN_DIR" ] && [ -f "$LOG_FOLDER/$LOG_FILE" ]; then
         echo "$message" &>> "$LOG_FOLDER/$LOG_FILE" &
     fi
 }
@@ -26,25 +29,23 @@ function log() {
 function start_listener {
     log "*** LISTENER LOGS ***"
 
-    check_perfomance
-
     if ! [ -d "$BRANCH_LISTENER_MAIN_DIR" ]; then
-        log "main dir($BRANCH_LISTENER_MAIN_DIR) not found! you need setup branch-listener properly!";
-        exit 1;
+        if ! echo "${PWD##*/}" | grep -q "branch-listener"; then
+            log "wrong current working directory!"
+        fi
+        BRANCH_LISTENER_MAIN_DIR="."
     fi
 
-    if ! [ -d "$BRANCH_LISTENER_MAIN_DIR/dist" ]; then
-        log "src folder not found! Please build branch-listener.";
-        exit 1;
-    fi
-
-    if ! [ -f "$LOG_FOLDER/$LOG_FILE" ]; then
-        mkdir "$LOG_FOLDER";
-        touch "$LOG_FOLDER/$LOG_FILE";
-    fi
-
+    # if ! [ -d "$BRANCH_LISTENER_MAIN_DIR/dist" ]; then
+    #     log "src folder not found! Please build branch-listener.";
+    #     exit 1;
+    # fi
     local index_path="$BRANCH_LISTENER_MAIN_DIR/dist/src/index.js"
-    nohup node "$index_path" &>> "$LOG_FOLDER/$LOG_FILE" &
+    if [ -f "$LOG_FOLDER/$LOG_FILE" ]; then
+        nohup node "$index_path" &>> "$LOG_FOLDER/$LOG_FILE" &
+    else 
+        node "$index_path"
+    fi
 }
 
 function kill_listener {

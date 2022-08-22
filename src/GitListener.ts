@@ -72,16 +72,23 @@ export default class GitListener implements Listener {
             if (user_date.hour > commit_date.hour) 
                 this.hours_difference = (user_date.hour - commit_date.hour) * 60;
 
+            console.log("minutes difference:", ((user_date.minutes - commit_date.minutes) + this.hours_difference));
+
             if (
                 ((user_date.minutes - commit_date.minutes) + this.hours_difference) >= 
                 this.config_server.minutes_difference
             ) 
                 return Promise.resolve(false);
 
+            console.log("previus commit:", this.prev_commit);
+            console.log("current commit:", this.current_commit);
+
             if (this.current_commit !== this.prev_commit) {
                 this.prev_commit = this.current_commit;
                 this.counter = 0;
             }
+
+            console.log("counter:", this.counter);
 
             if (
                 this.prev_commit === this.current_commit &&

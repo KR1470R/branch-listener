@@ -1,5 +1,6 @@
 
 
+
 <p align="center">
 	<strong>
 		<h1 align="center">branch-listener</h1>
@@ -57,6 +58,8 @@ So you will be able pull remote changes to your working branch on time, thus the
   <img alt="" src="https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white">
 </a><a href="https://bitbucket.org">
   <img alt="" src="https://img.shields.io/badge/bitbucket-%230047B3.svg?style=for-the-badge&logo=bitbucket&logoColor=white">
+</a><a href="https://gitlab.com">
+  <img alt="" src="https://img.shields.io/badge/gitlab-%23181717.svg?style=for-the-badge&logo=gitlab&logoColor=white">
 </a>
 
 
@@ -64,6 +67,7 @@ So you will be able pull remote changes to your working branch on time, thus the
 Beforehand you start the configuration you need to provide such information for **branch-listener** work properly:
 For git you will need provide: username, repository name and branch name you want listen to;\
 For bitbucket: username, app password, workspace name, repository slug and branch name.\
+For gitlab: project id, token and branch name;\
 ***‼️All your passwords will be stored on your local system without theft‼️***\
  **Let's start**
  
@@ -103,16 +107,15 @@ To uninstall branch-listener and remove all configs and settings:
     branch-listener uninstall
 
 ## CVS Request requirements
-| CVS | <img alt="" src="https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white">	| <img alt="" src="https://img.shields.io/badge/bitbucket-%230047B3.svg?style=for-the-badge&logo=bitbucket&logoColor=white"> | 	
-|----------------------------|----|-----|
-| Requests per-hour limit    | 60 | 60  |
-| Need token or app password | No | Yes |
+| CVS | <img alt="" src="https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white">	| <img alt="" src="https://img.shields.io/badge/bitbucket-%230047B3.svg?style=for-the-badge&logo=bitbucket&logoColor=white"> | <img alt="" src="https://img.shields.io/badge/gitlab-%23181717.svg?style=for-the-badge&logo=gitlab&logoColor=white"> |
+|----------------------------|----|-----|-----|
+| Requests per-hour limit    | 60 | 60  | 60  |
+| Need token or app password | No | Yes | Yes |
 ## License
 <img alt="" src="https://camo.githubusercontent.com/982edb824038d4ed388cf47101d10d06c1e9e5cc2b23b32a15ead6185e35430e/68747470733a2f2f7777772e676e752e6f72672f67726170686963732f67706c76332d6f722d6c617465722e706e67">
 
 ## To do
- 1. Add compatibility for Gitlab;
- 2. Add multi listeners;
+ 1. Add multi listeners;
 
 [1]:https://github.com/KR1470R/branch-listener#why-do-you-need-it
 [2]:https://github.com/KR1470R/branch-listener#supported-control-version-systems

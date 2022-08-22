@@ -62,6 +62,14 @@ if ! [ "$(cat  $BRANCH_LISTENER_SHELL_RC | grep 'branch-listener start')" ]; the
     echo 'if [ $TERM = "linux" ]; then branch-listener start; fi' | tee -a "$BRANCH_LISTENER_SHELL_RC"
 fi
 
+LOG_FOLDER="$MAIN_DIR/logs"
+LOG_FILE=output.log
+
+if ! [ -f "$LOG_FOLDER/$LOG_FILE" ]; then
+    mkdir "$LOG_FOLDER";
+    touch "$LOG_FOLDER/$LOG_FILE";
+fi
+
 branch-listener start
 
 echo "autorun of branch-listener configured successfully.";

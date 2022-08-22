@@ -2,6 +2,7 @@ import {
     ConfigServer, 
     ConfigGit, 
     ConfigBitbucket,
+    ConfigGitlab,
     supportable_configs
 } from "../util/types";
 import JSONManager from "./JSONManager";
@@ -11,7 +12,7 @@ export default class ConfigFactory {
     
     private readonly base_path: string = `${getBaseDir()}configs/`;
     private config_name!: string;
-    public type: "git" | "bitbucket" | "server";
+    public type: supportable_configs;
     public manager!: JSONManager;
 
     constructor(config_type: supportable_configs, isDefault = false) {
@@ -28,6 +29,8 @@ export default class ConfigFactory {
                 return (this.manager.content as ConfigBitbucket)[key as keyof ConfigBitbucket];
             case "server": 
                 return (this.manager.content as ConfigServer)[key as keyof ConfigServer];
+            case "gitlab":
+                return (this.manager.content as ConfigGitlab)[key as keyof ConfigGitlab];
             default: throw new Error("Uknown type config!");
         };   
     }
@@ -40,6 +43,8 @@ export default class ConfigFactory {
                 return (this.manager.content as ConfigBitbucket);
             case "server":
                 return (this.manager.content as ConfigServer);
+            case "gitlab":
+                return (this.manager.content as ConfigGitlab); 
             default: throw new Error("Uknown type config!");
         }
     }
@@ -54,6 +59,9 @@ export default class ConfigFactory {
                 break;
             case "server": 
                 (this.manager.content as ConfigServer)[key as keyof ConfigServer] = value as never;
+                break;
+            case "gitlab":
+                (this.manager.content as ConfigGitlab)[key as keyof ConfigGitlab] = value as never;
                 break;
             default: throw new Error("Uknown type config!");
         };
@@ -88,6 +96,11 @@ export default class ConfigFactory {
                 if (!this.getProperty("repo_slug")) throw new Error(`${base_template} Repository slug not found!`);
                 if (!this.getProperty("branch")) throw new Error(`${base_template} Branch not found!`);
                 if (!this.getProperty("app_password")) throw new Error(`${base_template} Access token not found!`);
+                break;
+            case "gitlab":
+                if (!this.getProperty("project_id")) throw new Error(`${base_template} Project ID not found!`);
+                if (!this.getProperty("token")) throw new Error(`${base_template} Token not found!`);
+                if (!this.getProperty("branch")) throw new Error(`${base_template} Branch not found!`);
                 break;
             default: throw new Error("Uknown type config!");
         }

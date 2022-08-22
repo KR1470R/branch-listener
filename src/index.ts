@@ -2,6 +2,7 @@ import {
     ConfigServer,
     ConfigGit,
     ConfigBitbucket,
+    ConfigGitlab,
     supportableCVS,
     Listener
 } from "./util/types";
@@ -10,6 +11,7 @@ import { SoundManager } from "./SoundManager";
 import express from "express";
 import GitListener from "./GitListener";
 import BitbucketListener from "./BitbucketListener";
+import GitlabListener from "./GitlabListener";
 import { getRandomInt, getBaseDir } from "./util/extra";
 import notifier from "node-notifier";
 import fs from "fs";
@@ -28,15 +30,23 @@ console.log(`Running with configs: ${JSON.stringify({
 
 function listen_new_commit() {
     return new Promise(resolve => {
-        const listener: Listener = config_server.getProperty("cvs") === "git" ? 
-            new GitListener(
+        let listener: Listener;
+        if (config_server.getProperty("cvs") === "git") {
+            listener = new GitListener(
                 cvs_config.getAllProperties() as ConfigGit,
                 config_server.getAllProperties() as ConfigServer 
-            ) :
-            new BitbucketListener(
+            );            
+        } else if (config_server.getProperty("cvs") === "bitbucket") {
+            listener = new BitbucketListener(
                 cvs_config.getAllProperties() as ConfigBitbucket,
                 config_server.getAllProperties() as ConfigServer 
             );
+        } else if (config_server.getProperty("cvs") === "gitlab") {
+            listener = new GitlabListener(
+                cvs_config.getAllProperties() as ConfigGitlab,
+                config_server.getAllProperties() as ConfigServer 
+            );
+        } else throw new Error("Uknown CVS!");
 
         const start = async () => {
             const isSound = await listener.isSoundNewCommit();

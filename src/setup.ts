@@ -127,12 +127,39 @@ const quiz_bibucket = (resolve: Function) => {
     });
 }
 
+const quiz_gitlab = (resolve: Function) => {
+    return new Promise(() => {
+        config_server.setProperty("cvs", "gitlab");
+
+        const gitlab_config = new ConfigFactory("gitlab");
+
+        input.question("Enter project ID: ", (answ: any) => {
+            if (!answ) throw new Error("Project ID is nessessary!");
+            gitlab_config.setProperty("project_id", answ);
+
+            input.question("Enter token: ", (answ: any) => {
+                if (!answ) throw new Error("Token is nessessary!");
+                gitlab_config.setProperty("token", answ);
+
+                input.question(`Enter branch name: `, (answ: any) => {
+                    if (!answ) throw new Error("Branch name is necessary!"); 
+                    gitlab_config.setProperty("branch", answ);
+
+                    gitlab_config.saveAll();
+                    quiz_server(resolve);
+                });
+            });
+        });
+    });
+}
+
 const narroving = () => {
     return new Promise(resolve => {
-        input.question("Choose Control Version System(git/bitbucket): ", (answ: any) => {
+        input.question("Choose Control Version System(git/bitbucket/gitlab): ", (answ: any) => {
             if (answ) {
                 if (String(answ).toLowerCase() === "git") return quiz_git(resolve);
                 else if (String(answ).toLowerCase() === "bitbucket") return quiz_bibucket(resolve);
+                else if (String(answ).toLowerCase() == "gitlab") return quiz_gitlab(resolve)
                 else throw new Error("Uknown control version system. Try again.");
             } else throw new Error("Unrecognizable input data. Try again.")
         });

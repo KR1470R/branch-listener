@@ -1,31 +1,27 @@
-import axios, { AxiosRequestConfig } from "axios";
+import axios from "axios";
 import { 
-    ConfigBitbucket, 
+    ConfigGitlab, 
     ConfigServer,
-    Listener 
+    Listener
 } from "./util/types";
 
-export default class BitbucketListener implements Listener {
-    
-    public config: ConfigBitbucket;
+export default class GitlabListener implements Listener {
+
+    public config: ConfigGitlab;
     public config_server: ConfigServer; 
-    public readonly axios_config: object;
+    public readonly axios_config!: object;
     private counter: number = 0;
     private prev_commit!: string;
     private current_commit!: string;
     private hours_difference: number = 0;
 
-    constructor(config: ConfigBitbucket, config_server: ConfigServer) {
+    constructor(config: ConfigGitlab, config_server: ConfigServer) {
         this.config = config;
         this.config_server = config_server;
         this.axios_config = {
             headers: {
-                "Content-Type": "application/json",
                 "Access-Control-Allow-Origin": "*",
-            },
-            auth: {
-                username: this.config.username,
-                password: this.config.app_password
+                "PRIVATE-TOKEN": this.config.token
             }
         };
     }
@@ -35,7 +31,7 @@ export default class BitbucketListener implements Listener {
     }
 
     private getGitBranchURL() {
-        return `https://api.bitbucket.org/2.0/repositories/${this.config.workspace}/${this.config.repo_slug}/refs/branches/${this.config.branch}`;
+        return `https://gitlab.com/api/v4/projects/${this.config.project_id}/repository/branches/${this.config.branch}`;
     }
 
     private async getBranchData() {
@@ -45,12 +41,11 @@ export default class BitbucketListener implements Listener {
         );
     }
 
-    public async isSoundNewCommit() {
+    public async isSoundNewCommit(): Promise<boolean> {
         try {
             const branch = await this.getBranchData();
-
-            this.current_commit = branch.data.target.hash;
-            const res_commit_date = new Date(branch.data.target.date);
+            this.current_commit = branch.data.commit.id;
+            const res_commit_date = new Date(branch.data.commit.created_at);
             const current_date = new Date();
 
             const commit_date = {
@@ -82,7 +77,7 @@ export default class BitbucketListener implements Listener {
             if (
                 ((user_date.minutes - commit_date.minutes) + this.hours_difference) >= 
                 this.config_server.minutes_difference
-            ) 
+            )
                 return Promise.resolve(false);
 
             console.log("previus commit:", this.prev_commit);
@@ -99,12 +94,12 @@ export default class BitbucketListener implements Listener {
                 this.prev_commit === this.current_commit &&
                 this.counter >= 2
             ) return Promise.resolve(false);
-
+            
             this.counter++;
 
             return Promise.resolve(true);
         } catch (error: any) {
-            console.log("BITBUCKET ERROR:", error);
+            console.log("GITLABLISTENER ERROR:", error);
             return Promise.resolve(false);
         }
     }

@@ -21,14 +21,20 @@ export type ConfigBitbucket = {
     branch: string;
 }
 
-export type Configs = ConfigServer | ConfigGit | ConfigBitbucket;
+export type ConfigGitlab = {
+    project_id: string;
+    token: string;
+    branch: string;
+}
 
-export type supportableCVS = "git" | "bitbucket";
+export type Configs = ConfigServer | ConfigGit | ConfigBitbucket | ConfigGitlab;
 
-export type supportable_configs = "server" | "git" | "bitbucket";
+export type supportableCVS = "git" | "bitbucket" | "gitlab";
+
+export type supportable_configs = "server" | "git" | "bitbucket" | "gitlab";
 
 export interface Listener {
-    config: ConfigGit | ConfigBitbucket;
+    config: ConfigGit | ConfigBitbucket | ConfigGitlab;
     config_server: ConfigServer;
     readonly axios_config: object;
     branch_name: string;

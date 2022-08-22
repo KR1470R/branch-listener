@@ -4,3 +4,4 @@ dist
 configs/bitbucket/config.json
 configs/git/config.json
 configs/server/config.json
+configs/gitlab/config.json
