@@ -1,9 +1,11 @@
 #!/bin/bash
 
-if [[ "$0" = "${BASH_SOURCE[0]}" ]]; then
-    echo "the script must be runned by source. exit";
-    exit 1;
-fi
+set -e
+
+# if [[ "$0" = "${BASH_SOURCE[0]}" ]]; then
+#     echo "the script must be runned by source. exit";
+#     exit 1;
+# fi
 
 if ! [ -d ./dist ]; then
     echo "dist folder not found! Please build branch-listener.";
@@ -63,4 +65,4 @@ fi
 branch-listener start
 
 echo "autorun of branch-listener configured successfully.";
-return 0
+exit 0

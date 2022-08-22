@@ -7,7 +7,7 @@ const input = readline.createInterface(stdin, stdout);
 const default_config_server = new ConfigFactory("server", true);
 const config_server = new ConfigFactory("server", false);
 
-const server_quiz = (resolve: Function) => {
+const quiz_server = (resolve: Function) => {
     return new Promise(() => {
         input.question(`Enter port(default ${default_config_server.getProperty("port")}): `, (answ: any) => {
             if (answ) {
@@ -84,7 +84,7 @@ const quiz_git = (resolve: Function) => {
                     git_config.setProperty("branch", answ);
 
                     git_config.saveAll();
-                    server_quiz(resolve);
+                    quiz_server(resolve);
                 });
             });
         });
@@ -118,7 +118,7 @@ const quiz_bibucket = (resolve: Function) => {
                             bitbucket_config.setProperty("branch", answ);
         
                             bitbucket_config.saveAll();
-                            server_quiz(resolve);
+                            quiz_server(resolve);
                         });
                     });
                 });

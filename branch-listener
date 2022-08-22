@@ -1,6 +1,14 @@
 #!/bin/bash
-LOG_FOLDER=$BRANCH_LISTENER_MAIN_DIR/logs
+LOG_FOLDER="$BRANCH_LISTENER_MAIN_DIR/logs"
 LOG_FILE=output.log
+
+function check_perfomance {
+    BRANCH_LISTENER_PORT=$(cat "$BRANCH_LISTENER_MAIN_DIR"/configs/server/config.json | jq -r ".port")
+    if [ -z "$BRANCH_LISTENER_PORT" ]; then
+        echo "branch-listener port is not defined. please reinstall or setup in correctly!"
+        exit 1
+    fi
+}
 
 function log() {
     local message="$1"
@@ -10,13 +18,15 @@ function log() {
     fi
 
     echo "$message"
-    if [ "$save_to_logs" = true ]; then
+    if [ "$save_to_logs" = true ] && [ -z "$BRANCH_LISTENER_MAIN_DIR" ]; then
         echo "$message" &>> "$LOG_FOLDER/$LOG_FILE" &
     fi
 }
 
 function start_listener {
     log "*** LISTENER LOGS ***"
+
+    check_perfomance
 
     if ! [ -d "$BRANCH_LISTENER_MAIN_DIR" ]; then
         log "main dir($BRANCH_LISTENER_MAIN_DIR) not found! you need setup branch-listener properly!";
@@ -41,12 +51,17 @@ function kill_listener {
     isLog=$1
     log "*** KILLING LISTENER LOGS ***" "$isLog"
 
+    if [ -z $BRANCH_LISTENER_PORT ]; then
+        echo "BRANCH_LISTENER_PORT not defined. trying 3001"
+        BRANCH_LISTENER_PORT="3001"
+    fi
+
     log "checking is listener alive..." "$isLog"
-    if [ "$(lsof -t -i:3001 -sTCP:LISTEN)" ]; then
-        kill -9 "$(lsof -t -i:3001 -sTCP:LISTEN)"
+    if [ "$(lsof -t -i:$BRANCH_LISTENER_PORT -sTCP:LISTEN)" ]; then
+        kill -9 "$(lsof -t -i:$BRANCH_LISTENER_PORT -sTCP:LISTEN)"
         log "listener has been killed" "$isLog"
     else 
-        log "listener is not alive at 3001" "$isLog"
+        log "listener is not alive at $BRANCH_LISTENER_PORT" "$isLog"
     fi 
 }
 
@@ -57,12 +72,21 @@ function restart_listener {
 
 function setup_listener {
     log "*** SETUP LISTENER LOGS ***"
+    if [ -z "$BRANCH_LISTENER_MAIN_DIR" ]; then
+        local setup_path="$BRANCH_LISTENER_MAIN_DIR/dist/src/setup.js"
+    elif echo "${PWD##*/}" | grep -q "branch-listener"; then
+        local setup_path="./dist/src/setup.js"
+    else
+        echo "uknown current working directory! please go to branch-listener repository directory!"
+        exit 1
+    fi
 
-    local setup_path="$BRANCH_LISTENER_MAIN_DIR/dist/src/setup.js"
     node "$setup_path"
 }
 
 function uninstall_listener {
+    check_perfomance
+
     if [ -n "$BRANCH_LISTENER_SHELL_RC" ]; then
         echo "cannot find registered shell rc, trying to defind..."
         if echo "$SHELL" | grep -q 'zsh'; then
@@ -103,6 +127,16 @@ function uninstall_listener {
     kill_listener false
 }
 
+function status_listener {
+    check_perfomance
+
+    if [ "$(lsof -t -i:$BRANCH_LISTENER_PORT -sTCP:LISTEN)" ]; then
+        log "branch-listener is alive at $BRANCH_LISTENER_PORT" false
+    else 
+        log "branch-listener is not alive"
+    fi 
+}
+
 function help_usage {
     log "Usage: branch-listener start | restart | kill | setup | uninstall | help"
     log '     start          Run listener on your port(default 3001)'
@@ -110,8 +144,9 @@ function help_usage {
     log '     kill           Turn off listener'
     log '     setup          Configure configs of listener'
     log '     uninstall      Totally uninstall branch-listener'
+    log '     status         Get status of branch-listener daemon'
     log '     help           Show this page'
-    return 0
+    exit 0
 }
 
 function narrowing() {
@@ -127,6 +162,8 @@ function narrowing() {
         setup_listener
     elif [ "$parameter" = "uninstall" ]; then
         uninstall_listener
+    elif [ "$parameter" = "status" ]; then
+        status_listener
     elif [ "$parameter" = "help" ]; then
         help_usage
     else
