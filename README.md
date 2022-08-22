@@ -93,12 +93,13 @@ For such purpose, you can make autorun of the branch-listener on startup system.
 Now, branch-listener is running on background on port 3001 or which you was specified in installation and it will be running at startup system and will notify you about new commits!\
 After this you will be able to use **branch-listener** as util:
 
-    Usage: branch-listener start | restart | kill | setup | uninstall | help
+    Usage: branch-listener start | restart | kill | setup | uninstall | status | help
          start          Run listener on your port(default 3001)
          restart        Restart listener
          kill           Turn off listener
          setup          Configure configs of listener
          uninstall      Totally uninstall branch-listener
+         status         Get status of branch-listener daemon
          help           Show this page
 
 ## Uninstall
