@@ -1,6 +1,6 @@
 import player from "play-sound";
 import fs from "fs";
-import { getBaseDir } from "./util/extra";
+import { getBaseDir } from "./extra";
 
 export class SoundManager {
     private readonly base_path: string = `${getBaseDir()}assets/sounds/`;

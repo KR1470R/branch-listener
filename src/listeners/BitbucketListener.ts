@@ -2,7 +2,7 @@ import Listener from "./Listener";
 import { 
     ConfigBitbucket, 
     ConfigServer
-} from "./util/types";
+} from "../util/types";
 
 export default class BitbucketListener extends Listener {
 

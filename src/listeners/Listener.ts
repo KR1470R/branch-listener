@@ -10,8 +10,8 @@ import {
     ConfigGithub,
     ConfigBitbucket,
     ConfigGitlab
-} from "./util/types";
-import { parseDate } from "./util/extra";
+} from "../util/types";
+import { parseDate } from "../util/extra";
 
 export default abstract class Listener {
 

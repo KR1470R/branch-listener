@@ -2,7 +2,7 @@ import Listener from "./Listener";
 import { 
     ConfigGitlab, 
     ConfigServer
-} from "./util/types";
+} from "../util/types";
 
 export default class GitlabListener extends Listener {
 

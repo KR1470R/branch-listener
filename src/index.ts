@@ -6,12 +6,12 @@ import {
     supportableCVS
 } from "./util/types";
 import ConfigFactory from "./util/ConfigFactory";
-import { SoundManager } from "./SoundManager";
+import { SoundManager } from "./util/SoundManager";
 import express from "express";
-import Listener from "Listener";
-import GitListener from "./GithubListener";
-import BitbucketListener from "./BitbucketListener";
-import GitlabListener from "./GitlabListener";
+import Listener from "./listeners/Listener";
+import GitListener from "./listeners/GithubListener";
+import BitbucketListener from "./listeners/BitbucketListener";
+import GitlabListener from "./listeners/GitlabListener";
 import { getRandomInt, getBaseDir } from "./util/extra";
 import notifier from "node-notifier";
 import fs from "fs";

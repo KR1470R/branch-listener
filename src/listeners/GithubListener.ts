@@ -2,7 +2,7 @@ import Listener from "./Listener";
 import { 
     ConfigGithub, 
     ConfigServer
-} from "./util/types";
+} from "../util/types";
 
 export default class GithubListener extends Listener {
 
