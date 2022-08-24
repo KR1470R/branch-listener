@@ -109,9 +109,9 @@ To uninstall branch-listener and remove all configs and settings:
 
 ## CVS Request requirements
 | CVS | <img alt="" src="https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white">	| <img alt="" src="https://img.shields.io/badge/bitbucket-%230047B3.svg?style=for-the-badge&logo=bitbucket&logoColor=white"> | <img alt="" src="https://img.shields.io/badge/gitlab-%23181717.svg?style=for-the-badge&logo=gitlab&logoColor=white"> |
-|----------------------------|----|-----|-----|
-| Requests per-hour limit    | 60 | 60  | 60  |
-| Need token or app password | No | Yes | Yes |
+|----------------------------|-------|-------|-------|
+| Requests per-hour limit    | 1000  | 1000  | 1000  |
+| Need token or app password | Yes   | Yes   | Yes   |
 ## License
 <img alt="" src="https://camo.githubusercontent.com/982edb824038d4ed388cf47101d10d06c1e9e5cc2b23b32a15ead6185e35430e/68747470733a2f2f7777772e676e752e6f72672f67726170686963732f67706c76332d6f722d6c617465722e706e67">
 
