@@ -1,6 +1,6 @@
 import { 
     ConfigServer, 
-    ConfigGit, 
+    ConfigGithub, 
     ConfigBitbucket,
     ConfigGitlab,
     supportable_configs
@@ -23,8 +23,8 @@ export default class ConfigFactory {
 
     public getProperty(key: string): number | string {
         switch(this.type) {
-            case "git": 
-                return (this.manager.content as ConfigGit)[key as keyof ConfigGit];
+            case "github": 
+                return (this.manager.content as ConfigGithub)[key as keyof ConfigGithub];
             case "bitbucket": 
                 return (this.manager.content as ConfigBitbucket)[key as keyof ConfigBitbucket];
             case "server": 
@@ -37,8 +37,8 @@ export default class ConfigFactory {
 
     public getAllProperties() {
         switch(this.type) {
-            case "git":
-                return (this.manager.content as ConfigGit);
+            case "github":
+                return (this.manager.content as ConfigGithub);
             case "bitbucket":
                 return (this.manager.content as ConfigBitbucket);
             case "server":
@@ -51,8 +51,8 @@ export default class ConfigFactory {
 
     public setProperty(key: string, value: string | number) {
         switch(this.type) {
-            case "git": 
-                (this.manager.content as ConfigGit)[key as keyof ConfigGit] = value as keyof ConfigGit; 
+            case "github": 
+                (this.manager.content as ConfigGithub)[key as keyof ConfigGithub] = value as keyof ConfigGithub; 
                 break;
             case "bitbucket": 
                 (this.manager.content as ConfigBitbucket)[key as keyof ConfigBitbucket] = value as keyof ConfigBitbucket; 
@@ -86,9 +86,10 @@ export default class ConfigFactory {
                     throw new Error("Timer must be larger or equal 60s. Please increase it!");
                 if (!this.getProperty("minutes_difference")) throw new Error(`${base_template} Minutes difference not found!`)
                 break;
-            case "git":
+            case "github":
                 if (!this.getProperty("username")) throw new Error(`${base_template} Username not found!`);
                 if (!this.getProperty("repo")) throw new Error(`${base_template} Repository URL not found!`);
+                if (!this.getProperty("token")) throw new Error(`${base_template} Token not found!`);
                 if (!this.getProperty("branch")) throw new Error(`${base_template} Branch not found!`);
                 break;
             case "bitbucket":

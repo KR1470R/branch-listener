@@ -65,26 +65,31 @@ const quiz_server = (resolve: Function) => {
     })
 }
 
-const quiz_git = (resolve: Function) => {
+const quiz_github = (resolve: Function) => {
     return new Promise(() => {
-        config_server.setProperty("cvs", "git");
+        config_server.setProperty("cvs", "github");
 
-        const git_config = new ConfigFactory("git");
+        const github_config = new ConfigFactory("github");
 
         input.question("Enter username: ", (answ: any) => {
             if (!answ) throw new Error("Username is nessessary!");
-            git_config.setProperty("username", answ);
+            github_config.setProperty("username", answ);
 
-            input.question("Enter repository name: ", (answ: any) => {
-                if (!answ) throw new Error("Repository name is necessary!");
-                git_config.setProperty("repo", answ);
-
-                input.question(`Enter branch name: `, (answ: any) => {
-                    if (!answ) throw new Error("Branch name is necessary!"); 
-                    git_config.setProperty("branch", answ);
-
-                    git_config.saveAll();
-                    quiz_server(resolve);
+            input.question("Entrer access token: ", (answ: any) => {
+                if (!answ) throw new Error("Access token is neccessary");
+                github_config.setProperty("token", answ);
+                
+                input.question("Enter repository name: ", (answ: any) => {
+                    if (!answ) throw new Error("Repository name is necessary!");
+                    github_config.setProperty("repo", answ);
+    
+                    input.question(`Enter branch name: `, (answ: any) => {
+                        if (!answ) throw new Error("Branch name is necessary!"); 
+                        github_config.setProperty("branch", answ);
+    
+                        github_config.saveAll();
+                        quiz_server(resolve);
+                    });
                 });
             });
         });
@@ -155,9 +160,9 @@ const quiz_gitlab = (resolve: Function) => {
 
 const narroving = () => {
     return new Promise(resolve => {
-        input.question("Choose Control Version System(git/bitbucket/gitlab): ", (answ: any) => {
+        input.question("Choose Control Version System(github/bitbucket/gitlab): ", (answ: any) => {
             if (answ) {
-                if (String(answ).toLowerCase() === "git") return quiz_git(resolve);
+                if (String(answ).toLowerCase() === "github") return quiz_github(resolve);
                 else if (String(answ).toLowerCase() === "bitbucket") return quiz_bibucket(resolve);
                 else if (String(answ).toLowerCase() == "gitlab") return quiz_gitlab(resolve)
                 else throw new Error("Uknown control version system. Try again.");

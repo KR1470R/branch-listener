@@ -1,15 +1,15 @@
 import {
     ConfigServer,
-    ConfigGit,
+    ConfigGithub,
     ConfigBitbucket,
     ConfigGitlab,
-    supportableCVS,
-    Listener
+    supportableCVS
 } from "./util/types";
 import ConfigFactory from "./util/ConfigFactory";
 import { SoundManager } from "./SoundManager";
 import express from "express";
-import GitListener from "./GitListener";
+import Listener from "Listener";
+import GitListener from "./GithubListener";
 import BitbucketListener from "./BitbucketListener";
 import GitlabListener from "./GitlabListener";
 import { getRandomInt, getBaseDir } from "./util/extra";
@@ -31,11 +31,11 @@ console.log(`Running with configs: ${JSON.stringify({
 function listen_new_commit() {
     return new Promise(resolve => {
         let listener: Listener;
-        if (config_server.getProperty("cvs") === "git") {
+        if (config_server.getProperty("cvs") === "github") {
             listener = new GitListener(
-                cvs_config.getAllProperties() as ConfigGit,
+                cvs_config.getAllProperties() as ConfigGithub,
                 config_server.getAllProperties() as ConfigServer 
-            );            
+            );
         } else if (config_server.getProperty("cvs") === "bitbucket") {
             listener = new BitbucketListener(
                 cvs_config.getAllProperties() as ConfigBitbucket,

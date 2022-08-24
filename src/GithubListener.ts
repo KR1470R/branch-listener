@@ -1,20 +1,21 @@
 import Listener from "./Listener";
 import { 
-    ConfigGitlab, 
+    ConfigGithub, 
     ConfigServer
 } from "./util/types";
 
-export default class GitlabListener extends Listener {
+export default class GithubListener extends Listener {
 
-    constructor(config: ConfigGitlab, config_server: ConfigServer) {
+    constructor(config: ConfigGithub, config_server: ConfigServer) {
         super(
-            "gitlab", 
+            "github", 
             config, 
             config_server, 
             {
                 headers: {
+                    "Content-Type": "application/vnd.github+json",
                     "Access-Control-Allow-Origin": "*",
-                    "PRIVATE-TOKEN": config.token
+                    "Authorization": `token ${config.token}`
                 }
             }
         );

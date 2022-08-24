@@ -73,7 +73,7 @@ function restart_listener {
 
 function setup_listener {
     log "*** SETUP LISTENER LOGS ***"
-    if [ -z "$BRANCH_LISTENER_MAIN_DIR" ]; then
+    if [ -n "$BRANCH_LISTENER_MAIN_DIR" ]; then
         local setup_path="$BRANCH_LISTENER_MAIN_DIR/dist/src/setup.js"
     elif echo "${PWD##*/}" | grep -q "branch-listener"; then
         local setup_path="./dist/src/setup.js"
