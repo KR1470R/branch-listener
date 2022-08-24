@@ -13,9 +13,9 @@ export default class GithubListener extends Listener {
             config_server, 
             {
                 headers: {
-                    "Content-Type": "application/vnd.github+json",
+                    "Accept": "application/vnd.github+json",
                     "Access-Control-Allow-Origin": "*",
-                    "Authorization": `token ${config.token}`
+                    "Authorization": `${config.token}`
                 }
             }
         );
