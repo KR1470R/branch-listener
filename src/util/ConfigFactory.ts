@@ -22,23 +22,38 @@ export default class ConfigFactory {
     public async init() {
         this.manager = new JSONManager(`${this.base_path}${this.type}/${this.config_name}`);
         await this.manager.init();
-        console.log("COnfigFactory initilized:", this.manager.content)
+    }
+
+    public get configsArray() {
+        return this.manager.content;
+    }
+
+    public get name() {
+        return this.type;
     }
 
     private defineConfig(
         id: number = 0
     ) {
+        let goalConfig;
         switch (this.type) {
-            case "github":
-                return (this.manager.content as ConfigGithub[])[id];
-            case "bitbucket":
-                return (this.manager.content as ConfigBitbucket[])[id];
             case "server":
-                return (this.manager.content as ConfigServer[])[0];
+                goalConfig = (this.manager.content as ConfigServer[])[0];
+                break;
+            case "github":
+                goalConfig = (this.manager.content as ConfigGithub[])[id]
+                break;
+            case "bitbucket":
+                goalConfig = (this.manager.content as ConfigBitbucket[])[id];
+                break;
             case "gitlab":
-                return (this.manager.content as ConfigGitlab[])[id];
+                goalConfig = (this.manager.content as ConfigGitlab[])[id];
+                break;
             default: throw new Error("Uknown type config!");
         }
+
+        if (!goalConfig) throw new Error(`${this.type} config not found at id ${id}!`);
+        return goalConfig;
     }
 
     public getProperty(

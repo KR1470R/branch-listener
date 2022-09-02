@@ -177,12 +177,14 @@ export default abstract class Listener {
             )
         }
         console.log("\n");
+
+        return Promise.resolve();
     }
     
     public async spawn() {
-        this.listen();
-        
         this.interval = setInterval(this.listen, this.config_server.timer_interval);
+
+        return this.listen();
     }
 
     public stop() {

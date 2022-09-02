@@ -5,7 +5,10 @@ import ConfigFactory from "./util/ConfigFactory";
 const listenerManager = new ListenerManager();
 const config_server = new ConfigFactory("server");
 
-listenerManager.init();
+listenerManager.init()
+    .then(() => {
+        listenerManager.startListen();
+    })
 
 // console.log(`Running with config: ${JSON.stringify({
 //     ...config_server.getAllProperties(),

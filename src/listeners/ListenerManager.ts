@@ -29,6 +29,7 @@ export default class ListenerManager {
         "gitlab": new Map()
     }
     private soundManager!: SoundManager;
+    private nonEmptyCVSConfigs: ConfigFactory[] = [];
 
     constructor() {
         this.server_config = new ConfigFactory("server");
@@ -45,16 +46,20 @@ export default class ListenerManager {
         this.soundManager = new SoundManager(
             Number(this.server_config.getProperty(0, "volume"))
         );
-        console.log("configs are initilized")
         this.checkIsAllCVSConfigsEmpty();
         this.checkConfigsValidation();
     }
 
     private checkIsAllCVSConfigsEmpty() {
-        if (!this.github_config.isEmpty()) return;
-        if (!this.bitbucket_config.isEmpty()) return;
-        if (!this.gitlab_config.isEmpty()) return;
-        throw new Error("All CVS Configs is empty! Please setup branch-listener!");
+        if (!this.github_config.isEmpty()) 
+            this.nonEmptyCVSConfigs.push(this.github_config);
+        if (!this.bitbucket_config.isEmpty()) 
+            this.nonEmptyCVSConfigs.push(this.bitbucket_config);
+        if (!this.gitlab_config.isEmpty()) 
+            this.nonEmptyCVSConfigs.push(this.gitlab_config);
+        
+        if (this.nonEmptyCVSConfigs.length === 0)
+            throw new Error("All CVS Configs is empty! Please setup branch-listener!");
     }
 
     private checkConfigsValidation() {
@@ -64,23 +69,27 @@ export default class ListenerManager {
         this.gitlab_config.checkValidation();
     }
 
-    private getConfig(cvs_name: supportableCVS): ConfigsCVS {
+    private getConfig(
+        cvs_name: supportableCVS,
+        id: number
+    ): ConfigsCVS {
         switch (cvs_name) {
             case "github": 
                 return this.github_config
-                            .getAllProperties() as ConfigGithub;
+                            .getAllProperties(id) as ConfigGithub;
             case "bitbucket": 
                 return this.bitbucket_config
-                            .getAllProperties() as ConfigBitbucket;
+                            .getAllProperties(id) as ConfigBitbucket;
             case "gitlab": 
                 return this.gitlab_config
-                            .getAllProperties() as ConfigGitlab;
+                            .getAllProperties(id) as ConfigGitlab;
             default: throw new Error("Uknown CVS name!");                
         }
     }
 
-    private swawnListener(
+    private spawnListener(
         cvs_name: supportableCVS,
+        id: number
     ) {
         const server_config_all = this.server_config
             .getAllProperties() as ConfigServer;
@@ -90,21 +99,21 @@ export default class ListenerManager {
         switch (cvs_name) {
             case "github": 
                 listener = new GithubListener(
-                    this.getConfig(cvs_name) as ConfigGithub,
+                    this.getConfig(cvs_name, id) as ConfigGithub,
                     server_config_all,
                     this.soundManager
                 );
                 break;
             case "bitbucket":
                 listener = new BitbucketListener(
-                    this.getConfig(cvs_name) as ConfigBitbucket,
+                    this.getConfig(cvs_name, id) as ConfigBitbucket,
                     server_config_all,
                     this.soundManager
                 );
                 break;
             case "gitlab":
                 listener = new GitlabListener(
-                    this.getConfig(cvs_name) as ConfigGitlab,
+                    this.getConfig(cvs_name, id) as ConfigGitlab,
                     server_config_all,
                     this.soundManager
                 );
@@ -112,10 +121,15 @@ export default class ListenerManager {
             default: throw new Error("Uknown CVS name!");    
         }
 
+        let lastListenerKey = this.getLastListener(cvs_name, "key");
+        if (!lastListenerKey) lastListenerKey = 0;
+
         this.Listeners[cvs_name].set(
-            Number(this.getLastListener(cvs_name, "key")) + 1,
+            Number(lastListenerKey) + 1,
             listener
         );
+
+        return listener;
     }
 
     private killListener(
@@ -154,9 +168,23 @@ export default class ListenerManager {
         
     }
 
-    public getListListeners(cvs_name: supportableCVS) {
-        // const config = this.getConfig(cvs_name);
+    public getListListeners(cvs_name: supportableCVS) {}
 
-        
+    public async startListen() {
+        const listener_promises = [];
+
+        for (const configCVS of this.nonEmptyCVSConfigs) {
+            for (const config of configCVS.configsArray) {
+                console.log(configCVS.name, config);
+                listener_promises.push(
+                    this.spawnListener(
+                        configCVS.name as supportableCVS, configCVS.configsArray.indexOf(config)
+                    ).spawn()
+                );
+            }
+        }
+
+        console.log(listener_promises);
+        return Promise.allSettled(listener_promises);
     }
 }
