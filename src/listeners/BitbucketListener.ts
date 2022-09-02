@@ -3,10 +3,11 @@ import {
     ConfigBitbucket, 
     ConfigServer
 } from "../util/types";
+import { SoundManager } from "../util/SoundManager";
 
 export default class BitbucketListener extends Listener {
 
-    constructor(config: ConfigBitbucket, config_server: ConfigServer) {
+    constructor(config: ConfigBitbucket, config_server: ConfigServer, soundManager: SoundManager) {
         super(
             "bitbucket", 
             config, 
@@ -20,7 +21,8 @@ export default class BitbucketListener extends Listener {
                     username: config.username,
                     password: config.app_password
                 }
-            }
+            },
+            soundManager
         );
     }
 }

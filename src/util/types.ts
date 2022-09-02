@@ -139,3 +139,12 @@ export type DateType = {
     hour: number;
     minutes: number; 
 }
+
+export const default_config_server = {   
+    "port": 3001,
+    "timer_interval": 60000,
+    "minutes_difference": 25,
+    "volume": 50
+}
+
+export const base_config_id = 0;

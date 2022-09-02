@@ -1,6 +1,0 @@
-{   
-    "port": 3001,
-    "timer_interval": 60000,
-    "minutes_difference": 25,
-    "volume": 50
-}

@@ -2,7 +2,7 @@
   "name": "branch-listener",
   "version": "5.1.4",
   "description": "The branch-listener will notify you for a new commit of your repository of the branch that you've specified. If new commit is pushed, it will sound by a catty meow two times.",
-  "main": "index.js",
+  "main": "start.js",
   "scripts": {
     "build": "tsc -p tsconfig.json"
   },

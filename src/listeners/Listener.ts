@@ -11,7 +11,9 @@ import {
     ConfigBitbucket,
     ConfigGitlab
 } from "../util/types";
-import { parseDate } from "../util/extra";
+import { parseDate, getRandomInt } from "../util/extra";
+import { SoundManager } from "../util/SoundManager";
+import NotificationManager from "../util/NotificationManager";
 
 export default abstract class Listener {
 
@@ -23,17 +25,23 @@ export default abstract class Listener {
     private prev_commit!: string;
     private current_commit!: string;
     private hours_difference: number = 0;
+    private interval!: NodeJS.Timer;
+    private soundManager: SoundManager;
+    private notificationManager: NotificationManager;
 
     constructor(
         cvs_name: supportableCVS, 
         config: ConfigsCVS, 
         config_server: ConfigServer, 
-        axios_config: object
+        axios_config: object,
+        soundManager: SoundManager
     ) {
         this.cvs_name = cvs_name;
         this.config = config;
         this.config_server = config_server;
         this.axios_config = axios_config;
+        this.soundManager = soundManager,
+        this.notificationManager = new NotificationManager();
     }
 
     public get branch_name() {
@@ -93,7 +101,7 @@ export default abstract class Listener {
         return data;
     }
 
-    public async isSoundNewCommit(): Promise<boolean> {
+    private async isSoundNewCommit(): Promise<boolean> {
         try {
             const commitData = await this.getCommitData();
             
@@ -155,5 +163,30 @@ export default abstract class Listener {
             console.log(`${this.cvs_name.toUpperCase()}LISTENER ERROR:`, error);
             return Promise.resolve(false);
         }
+    }
+
+    private async listen() {
+        const isSound = await this.isSoundNewCommit();
+        console.log("isSound:", isSound);
+
+        if (isSound) {
+            this.soundManager.play(`meow${getRandomInt(1, 3)}.mp3`);
+            this.notificationManager.notify(
+                `New commit in ${this.branch_name}!`, 
+                `Hurry up to pull the ${this.branch_name}!`
+            )
+        }
+        console.log("\n");
+    }
+    
+    public async spawn() {
+        this.listen();
+        
+        this.interval = setInterval(this.listen, this.config_server.timer_interval);
+    }
+
+    public stop() {
+        if (this.interval)
+            clearInterval(this.interval);
     }
 }

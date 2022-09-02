@@ -27,3 +27,15 @@ export const parseDate = (date: DateType) => {
 
     return `${date.hour}:${minutes} - ${date.day} ${monthNames[date.month]}, ${date.year}`;
 }
+
+export const isArrayHasAnyEmptyObject = (array: object[]) => {
+    if (!array || array.length === 0) return true;
+
+    for (const obj of array) {
+        if (typeof obj !== "object") throw new Error("The element is not object!");
+        
+        return Object.keys(obj).length === 0;
+    }
+    
+    return false;
+}

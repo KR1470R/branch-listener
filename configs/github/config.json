@@ -1,6 +1,10 @@
 {
-	"username": "KR1470R",
-	"repo": "branch-listener",
-	"branch": "master",
-	"token": "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"
+	"all": [
+		{
+			"username": "KR1470R",
+			"token": "ASDSDA",
+			"repo": "asdasd",
+			"branch": "asda"
+		}
+	]
 }

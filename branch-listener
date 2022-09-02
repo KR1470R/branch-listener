@@ -40,7 +40,7 @@ function start_listener {
     #     log "src folder not found! Please build branch-listener.";
     #     exit 1;
     # fi
-    local index_path="$BRANCH_LISTENER_MAIN_DIR/dist/src/index.js"
+    local index_path="$BRANCH_LISTENER_MAIN_DIR/dist/src/start.js"
     if [ -f "$LOG_FOLDER/$LOG_FILE" ]; then
         nohup node "$index_path" &>> "$LOG_FOLDER/$LOG_FILE" &
     else 

@@ -6,104 +6,108 @@ import {
     supportable_configs
 } from "../util/types";
 import JSONManager from "./JSONManager";
-import { getBaseDir } from "./extra";
+import { getBaseDir, isArrayHasAnyEmptyObject } from "./extra";
 
 export default class ConfigFactory {
     
     private readonly base_path: string = `${getBaseDir()}configs/`;
-    private config_name!: string;
+    private config_name: string = "config.json";
     public type: supportable_configs;
     public manager!: JSONManager;
 
-    constructor(config_type: supportable_configs, isDefault = false) {
+    constructor(config_type: supportable_configs) {
         this.type = config_type;
-        this.config_name = isDefault && config_type === "server" ? "default_config.json" : "config.json";
+    }
+
+    public async init() {
         this.manager = new JSONManager(`${this.base_path}${this.type}/${this.config_name}`);
+        await this.manager.init();
+        console.log("COnfigFactory initilized:", this.manager.content)
     }
 
-    public getProperty(key: string): number | string {
-        switch(this.type) {
-            case "github": 
-                return (this.manager.content as ConfigGithub)[key as keyof ConfigGithub];
-            case "bitbucket": 
-                return (this.manager.content as ConfigBitbucket)[key as keyof ConfigBitbucket];
-            case "server": 
-                return (this.manager.content as ConfigServer)[key as keyof ConfigServer];
-            case "gitlab":
-                return (this.manager.content as ConfigGitlab)[key as keyof ConfigGitlab];
-            default: throw new Error("Uknown type config!");
-        };   
-    }
-
-    public getAllProperties() {
-        switch(this.type) {
+    private defineConfig(
+        id: number = 0
+    ) {
+        switch (this.type) {
             case "github":
-                return (this.manager.content as ConfigGithub);
+                return (this.manager.content as ConfigGithub[])[id];
             case "bitbucket":
-                return (this.manager.content as ConfigBitbucket);
+                return (this.manager.content as ConfigBitbucket[])[id];
             case "server":
-                return (this.manager.content as ConfigServer);
+                return (this.manager.content as ConfigServer[])[0];
             case "gitlab":
-                return (this.manager.content as ConfigGitlab); 
+                return (this.manager.content as ConfigGitlab[])[id];
             default: throw new Error("Uknown type config!");
         }
     }
 
-    public setProperty(key: string, value: string | number) {
-        switch(this.type) {
-            case "github": 
-                (this.manager.content as ConfigGithub)[key as keyof ConfigGithub] = value as keyof ConfigGithub; 
-                break;
-            case "bitbucket": 
-                (this.manager.content as ConfigBitbucket)[key as keyof ConfigBitbucket] = value as keyof ConfigBitbucket; 
-                break;
-            case "server": 
-                (this.manager.content as ConfigServer)[key as keyof ConfigServer] = value as never;
-                break;
-            case "gitlab":
-                (this.manager.content as ConfigGitlab)[key as keyof ConfigGitlab] = value as never;
-                break;
-            default: throw new Error("Uknown type config!");
-        };
+    public getProperty(
+        id: number = 0,
+        key: string
+    ): number | string {
+        const config = this.defineConfig(id);
+
+        return config[key as keyof typeof config];
     }
 
-    public saveAll() {
-        this.manager.save();
+    public getAllProperties(id: number = 0) {
+        return this.defineConfig(id);
+    }
+
+    public setProperty(
+        id: number = 0,
+        key: string, 
+        value: string | number
+    ) {
+        const config = this.defineConfig(id);
+        config[key as keyof typeof config] = value as keyof typeof config;
+    }
+
+    public saveAll(override: boolean) {
+        this.manager.save(override);
+    }
+
+    private getKeys(id: number = 0): Array<string> {
+        return Object.keys(this.manager.content[id]);
     }
 
     public checkValidation() {
         const base_template = `ERROR in ${this.type} config:`;
 
-        if (!this.manager.content || Object.keys(this.manager.content).length === 0) 
-            throw new Error(`${base_template} config is empty! Tip: run setup to fill it.`);
+        if (this.type === "server") {
+            if (this.isEmptySpecified(0)) 
+                throw new Error(`${base_template} config is empty!`);
+            
+            const cvs_parameters = this.getKeys(0);
 
-        switch (this.type) {
-            case "server":
-                if (!this.getProperty("cvs")) throw new Error(`${base_template} Control version system not found!`);
-                if (!this.getProperty("port")) throw new Error(`${base_template} Port not found!`)
-                if (!this.getProperty("timer_interval")) throw new Error(`${base_template} Timer interval not found!`)
-                if (Number(this.getProperty("timer_interval")) < 60000)
-                    throw new Error("Timer must be larger or equal 60s. Please increase it!");
-                if (!this.getProperty("minutes_difference")) throw new Error(`${base_template} Minutes difference not found!`)
-                break;
-            case "github":
-                if (!this.getProperty("username")) throw new Error(`${base_template} Username not found!`);
-                if (!this.getProperty("repo")) throw new Error(`${base_template} Repository URL not found!`);
-                if (!this.getProperty("token")) throw new Error(`${base_template} Token not found!`);
-                if (!this.getProperty("branch")) throw new Error(`${base_template} Branch not found!`);
-                break;
-            case "bitbucket":
-                if (!this.getProperty("workspace")) throw new Error(`${base_template} workspace not found!`);
-                if (!this.getProperty("repo_slug")) throw new Error(`${base_template} Repository slug not found!`);
-                if (!this.getProperty("branch")) throw new Error(`${base_template} Branch not found!`);
-                if (!this.getProperty("app_password")) throw new Error(`${base_template} Access token not found!`);
-                break;
-            case "gitlab":
-                if (!this.getProperty("project_id")) throw new Error(`${base_template} Project ID not found!`);
-                if (!this.getProperty("token")) throw new Error(`${base_template} Token not found!`);
-                if (!this.getProperty("branch")) throw new Error(`${base_template} Branch not found!`);
-                break;
-            default: throw new Error("Uknown type config!");
+            for (const key of cvs_parameters) {
+                if (!this.getProperty(0, key))
+                    throw new Error(`${base_template} Parameter ${cvs_parameters[Number(key)]} not found!`);
+            }
+        } else {
+            for (let config_id = 0; config_id <= this.manager.content.length - 1; config_id++) {
+                const cvs_parameters = this.getKeys(config_id);
+
+                for (const key of cvs_parameters) {
+                    if (!this.getProperty(config_id, key))
+                        throw new Error(`${base_template} Parameter ${cvs_parameters[Number(key)]} not found!`);
+                }
+            }
         }
+    }
+
+    public isEmptySpecified(id: number) {
+        return (
+            !this.manager?.content[id] || 
+            Object.keys(this.manager?.content[id])?.length === 0
+        );
+    }
+
+    public isEmpty() {
+        return (
+            !this.manager.content ||
+            this.manager.content.length === 0 ||
+            isArrayHasAnyEmptyObject(this.manager.content)
+        );
     }
 }
