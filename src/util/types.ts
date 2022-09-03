@@ -148,3 +148,9 @@ export const default_config_server = {
 }
 
 export const base_config_id = 0;
+
+export type ListenerMeta = {
+    id: number;
+    status: "active" | "inactive" | "pending";
+    log_path?: string;
+};

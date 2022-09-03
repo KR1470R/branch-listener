@@ -160,7 +160,7 @@ export default abstract class Listener {
 
             return Promise.resolve(true);
         } catch (error: any) {
-            console.log(`${this.cvs_name.toUpperCase()}LISTENER ERROR:`, error);
+            console.log(`${this.cvs_name.toUpperCase()}LISTENER ERROR:`, error.message);
             return Promise.resolve(false);
         }
     }

@@ -7,6 +7,7 @@ const config_server = new ConfigFactory("server");
 
 listenerManager.init()
     .then(() => {
+        console.log("initilized")
         listenerManager.startListen();
     })
 

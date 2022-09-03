@@ -12,6 +12,7 @@ import {
     supportableCVS,
 } from "../util/types";
 import { SoundManager } from "../util/SoundManager";
+import ListenersJournalManager from "../util/ListenersJournalManager";
 
 export default class ListenerManager {
 
@@ -30,12 +31,14 @@ export default class ListenerManager {
     }
     private soundManager!: SoundManager;
     private nonEmptyCVSConfigs: ConfigFactory[] = [];
+    private listenersJournalManager: ListenersJournalManager;
 
     constructor() {
         this.server_config = new ConfigFactory("server");
         this.github_config = new ConfigFactory("github");
         this.bitbucket_config = new ConfigFactory("bitbucket");
         this.gitlab_config = new ConfigFactory("gitlab");
+        this.listenersJournalManager = new ListenersJournalManager();
     }
 
     public async init() {
@@ -48,6 +51,7 @@ export default class ListenerManager {
         );
         this.checkIsAllCVSConfigsEmpty();
         this.checkConfigsValidation();
+        await this.listenersJournalManager.init();
     }
 
     private checkIsAllCVSConfigsEmpty() {
@@ -129,6 +133,14 @@ export default class ListenerManager {
             listener
         );
 
+        this.listenersJournalManager.addListener(
+            cvs_name,
+            {
+                id,
+                status: "pending"
+            }
+        );
+
         return listener;
     }
 
@@ -165,7 +177,6 @@ export default class ListenerManager {
                 all.push(Array.from(this.Listeners[cvs_name].values()).pop());
                 return all;
         }
-        
     }
 
     public getListListeners(cvs_name: supportableCVS) {}
@@ -175,7 +186,6 @@ export default class ListenerManager {
 
         for (const configCVS of this.nonEmptyCVSConfigs) {
             for (const config of configCVS.configsArray) {
-                console.log(configCVS.name, config);
                 listener_promises.push(
                     this.spawnListener(
                         configCVS.name as supportableCVS, configCVS.configsArray.indexOf(config)
@@ -184,7 +194,6 @@ export default class ListenerManager {
             }
         }
 
-        console.log(listener_promises);
         return Promise.allSettled(listener_promises);
     }
 }

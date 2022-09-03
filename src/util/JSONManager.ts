@@ -51,8 +51,10 @@ export default class JSONManager {
     }
 
     public save(override: boolean) {
-        if (Object.keys( this.base_template.all[0]).length === 0) 
+        if (Object.keys(this.base_template.all[0]).length === 0) 
             this.base_template.all.pop();
+
+        this.clearEmptyObjects();
 
         if (override) {
             if (Array.isArray(this.content))
@@ -65,5 +67,20 @@ export default class JSONManager {
             fs.writeFileSync(this.path, JSON.stringify(this.base_template, null, '\t'));
         }
     }
-    
+
+    private clearEmptyObjects() {
+        if (Array.isArray(this.content)) {
+            for (const obj of this.content) {
+                if (
+                    typeof obj !== "object" ||
+                    !Object.keys(obj).length 
+                ) {
+                    this.content.slice(
+                        this.content.indexOf(obj),
+                        1
+                    );
+                }
+            }
+        }
+    }
 }
