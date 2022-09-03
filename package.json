@@ -1,6 +1,6 @@
 {
   "name": "branch-listener",
-  "version": "6.0.1",
+  "version": "6.0.2",
   "description": "The branch-listener will notify you for a new commit of your repository of the branch that you've specified. If new commit is pushed, it will sound by a catty meow two times.",
   "main": "start.js",
   "scripts": {
