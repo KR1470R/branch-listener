@@ -32,7 +32,7 @@ export default class ConfigFactory {
         return this.type;
     }
 
-    private defineConfig(
+    public defineConfig(
         id: number = 0
     ) {
         let goalConfig;

@@ -1,3 +1,4 @@
+import Listener from "../listeners/Listener";
 
 export type ConfigServer = {
     cvs: string;
@@ -149,8 +150,16 @@ export const default_config_server = {
 
 export const base_config_id = 0;
 
+export type ListenerStatus = "active" | "inactive" | "pending";
+
 export type ListenerMeta = {
     id: number;
-    status: "active" | "inactive" | "pending";
+    status: ListenerStatus;
     log_path?: string;
+};
+
+export type ListenersMapType = {
+    "github": Map<number, Listener>,
+    "bitbucket": Map<number, Listener>,
+    "gitlab": Map<number, Listener>
 };

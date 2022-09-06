@@ -1,6 +1,6 @@
 import JSONManager from "./JSONManager";
 import { getBaseDir, isArrayHasAnyEmptyObject } from "./extra";
-import { ListenerMeta, supportableCVS } from "./types";
+import { ListenerMeta, ListenersMapType, supportableCVS } from "./types";
 
 export default class ListenersJournalManager {
     
@@ -78,5 +78,9 @@ export default class ListenersJournalManager {
 
         if (definedListenerMeta.length) return true;
         else return false;
+    }
+    
+    public getListenersJournal(cvs_name: supportableCVS) {
+        return this.managers[cvs_name].content;
     }
 }

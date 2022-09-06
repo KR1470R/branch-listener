@@ -57,12 +57,13 @@ export default class JSONManager {
         this.clearEmptyObjects();
 
         if (override) {
+            console.log("overrided")
             if (Array.isArray(this.content))
                 this.base_template.all = [this.content[base_config_id]]
             else this.base_template.all = this.content;
             fs.writeFileSync(this.path, JSON.stringify(this.base_template, null, '\t'));
         } else {
-            this.base_template.all = this.base_template.all.concat(this.content_backup);
+            console.log("just added");
             this.base_template.all = this.base_template.all.concat(this.content);
             fs.writeFileSync(this.path, JSON.stringify(this.base_template, null, '\t'));
         }
