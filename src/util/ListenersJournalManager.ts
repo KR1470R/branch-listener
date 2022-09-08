@@ -47,33 +47,19 @@ export default class ListenersJournalManager {
     }
 
     public removeListener(cvs_name: supportableCVS, id: number) {
-        if (!this.isEmpty(cvs_name)) throw new Error(`${cvs_name} journal is empty!`);
+        if (this.isEmpty(cvs_name)) throw new Error(`${cvs_name} journal is empty!`);
 
         if (!this.isListenerExist(cvs_name, id)) {
             console.log(`can't remove listener with id ${id} - not found!`);
             return;
         }
 
-        const target_manager = this.managers[cvs_name];
-
-        const target_listener = target_manager.content.filter(listener => {
-            return (listener as ListenerMeta).id === id;
-        });
-
-        target_manager.content.splice(
-            target_manager.content.indexOf(target_listener),
-            1
-        );
-
-        target_manager.save(true);
+        this.managers[cvs_name].removeSpecifiedObject(id);
     }
 
     public isEmpty(cvs_name: supportableCVS) {
-        return (
-            !this.managers[cvs_name].content ||
-            this.managers[cvs_name].content.length === 0 ||
-            isArrayHasAnyEmptyObject(this.managers[cvs_name].content)
-        );
+        console.log(cvs_name, this.managers[cvs_name].content);
+        return this.managers[cvs_name].isEmpty();
     }
 
     private isListenerExist(cvs_name: supportableCVS, id: number) {

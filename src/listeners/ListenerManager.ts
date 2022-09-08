@@ -111,22 +111,20 @@ export default class ListenerManager {
         });
     }
 
+    private getCVSConfigManager(cvs_name: supportableCVS): ConfigFactory {
+        switch(cvs_name) {
+            case "github": return this.github_config;
+            case "bitbucket": return this.bitbucket_config;
+            case "gitlab": return this.gitlab_config;
+            default: throw new Error("Uknown CVS name!"); 
+        }
+    }
+
     private getConfig(
         cvs_name: supportableCVS,
         id: number
-    ): ConfigsCVS {
-        switch (cvs_name) {
-            case "github": 
-                return this.github_config
-                            .getAllProperties(id) as ConfigGithub;
-            case "bitbucket": 
-                return this.bitbucket_config
-                            .getAllProperties(id) as ConfigBitbucket;
-            case "gitlab": 
-                return this.gitlab_config
-                            .getAllProperties(id) as ConfigGitlab;
-            default: throw new Error("Uknown CVS name!");                
-        }
+    ) {
+        return this.getCVSConfigManager(cvs_name).getAllProperties(id) as ConfigsCVS;
     }
 
     private spawnListener(
@@ -189,6 +187,8 @@ export default class ListenerManager {
         if (this.isListenerAlive(cvs_name, id)) {
             this.stopListener(cvs_name, id);
             this.ListenersMap[cvs_name].delete(id);
+            this.listenersJournalManager.removeListener(cvs_name, id);
+            this.getCVSConfigManager(cvs_name).removeConfig(id);
         } else console.log(`The listener ${cvs_name}:${id} has already murdered.`);
     }
 
@@ -248,7 +248,7 @@ export default class ListenerManager {
     public getListListeners(cvs_name: supportableCVS) {}
 
     public async startListen() {
-
+        this.killListener("gitlab", 2);
         // this.listenersJournalManager.setListenerStatus("github", 0, "active");
     }
 }

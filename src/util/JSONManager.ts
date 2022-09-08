@@ -1,12 +1,5 @@
 import fs from "fs";
-import { 
-    base_config_id,
-    ConfigServer,
-    ConfigGithub,
-    ConfigBitbucket,
-    ConfigGitlab,
-    ListenerMeta
-} from "./types";
+import { isArrayHasAnyEmptyObject } from "./extra";
 
 export default class JSONManager {
     
@@ -65,7 +58,7 @@ export default class JSONManager {
 
         if (override) this.base_template.all = this.content;
         else this.base_template.all = this.base_template.all.concat(this.content);
-        
+        console.log("saving...", this.base_template);
         fs.writeFileSync(this.path, JSON.stringify(this.base_template, null, '\t'));
     }
 
@@ -83,6 +76,26 @@ export default class JSONManager {
                 }
             }
         }
+    }
+
+    public removeSpecifiedObject(id: number) {
+        if (!this.content[id])
+            throw new Error("element is undefined");
+        
+        this.content.splice(
+            id,
+            1
+        );
+        
+        this.save(true);
+    }
+
+    public isEmpty() {
+        return (
+            !this.content ||
+            this.content.length === 0 ||
+            isArrayHasAnyEmptyObject(this.content)
+        );
     }
 
 }

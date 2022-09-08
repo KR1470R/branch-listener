@@ -125,4 +125,8 @@ export default class ConfigFactory {
             isArrayHasAnyEmptyObject(this.manager.content)
         );
     }
+
+    public removeConfig(id: number) {
+        this.manager.removeSpecifiedObject(id);
+    }
 }
