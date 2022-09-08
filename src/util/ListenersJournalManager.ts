@@ -1,6 +1,6 @@
 import JSONManager from "./JSONManager";
 import { getBaseDir, isArrayHasAnyEmptyObject } from "./extra";
-import { ListenerMeta, ListenersMapType, supportableCVS } from "./types";
+import { ListenerMeta, ListenerStatus, supportableCVS } from "./types";
 
 export default class ListenersJournalManager {
     
@@ -17,11 +17,22 @@ export default class ListenersJournalManager {
     }
 
     constructor() {}
-
+    
     public async init() {
         for (const [name_manager, manager] of Object.entries(this.managers)) {
             await manager.init();
         }
+    }
+
+    public setListenerStatus(cvs_name: supportableCVS, id: number, status: ListenerStatus) {
+        if (!this.isListenerExist(cvs_name, id)) {
+            console.log(`can't change status of the listener with id ${id} - not found!`);
+            return;
+        }
+
+        const target_manager = this.managers[cvs_name];
+        (target_manager.content[id] as ListenerMeta).status = status;
+        target_manager.save(true);
     }
 
     public addListener(cvs_name: supportableCVS, listener_meta: ListenerMeta) {

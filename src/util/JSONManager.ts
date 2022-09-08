@@ -1,5 +1,12 @@
 import fs from "fs";
-import { base_config_id } from "./types";
+import { 
+    base_config_id,
+    ConfigServer,
+    ConfigGithub,
+    ConfigBitbucket,
+    ConfigGitlab,
+    ListenerMeta
+} from "./types";
 
 export default class JSONManager {
     
@@ -37,16 +44,16 @@ export default class JSONManager {
         return true;
     }
 
-    private overrideIfNotValidFile() {
+    private overrideIfNotValidFile(): Promise<void> {
         return new Promise((resolve, reject) => {
             const isValid = this.checkValidation();
 
             if (!isValid) {
                 fs.writeFile(this.path, JSON.stringify(this.base_template), err => {
                     if (err) reject(err);
-                    resolve(1);
+                    resolve();
                 });
-            } else resolve(1);
+            } else resolve();
         });
     }
 
@@ -56,17 +63,10 @@ export default class JSONManager {
 
         this.clearEmptyObjects();
 
-        if (override) {
-            console.log("overrided")
-            if (Array.isArray(this.content))
-                this.base_template.all = [this.content[base_config_id]]
-            else this.base_template.all = this.content;
-            fs.writeFileSync(this.path, JSON.stringify(this.base_template, null, '\t'));
-        } else {
-            console.log("just added");
-            this.base_template.all = this.base_template.all.concat(this.content);
-            fs.writeFileSync(this.path, JSON.stringify(this.base_template, null, '\t'));
-        }
+        if (override) this.base_template.all = this.content;
+        else this.base_template.all = this.base_template.all.concat(this.content);
+        
+        fs.writeFileSync(this.path, JSON.stringify(this.base_template, null, '\t'));
     }
 
     private clearEmptyObjects() {
@@ -84,4 +84,5 @@ export default class JSONManager {
             }
         }
     }
+
 }

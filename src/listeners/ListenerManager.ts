@@ -49,6 +49,8 @@ export default class ListenerManager {
         this.checkIsAllCVSConfigsEmpty();
         this.checkConfigsValidation();
         await this.listenersJournalManager.init();
+        await this.restoreListenersFromJournal();
+        await this.restoreListenersFromConfigs();
     }
 
     private checkIsAllCVSConfigsEmpty() {
@@ -70,20 +72,43 @@ export default class ListenerManager {
         this.gitlab_config.checkValidation();
     }
 
-    private restoreListenersFromJournal() {
-        for (const [cvs_name, map] of Object.entries(this.ListenersMap)) {
-            if (!this.listenersJournalManager.isEmpty(cvs_name as supportableCVS)) {
+    private restoreListenersFromJournal(): Promise<void> {
+        return new Promise(resolve => {
+            for (const cvs_name of Object.keys(this.ListenersMap)) {
+                if (!this.listenersJournalManager.isEmpty(cvs_name as supportableCVS)) {
+                    for (
+                        const listeners_journal of 
+                        this.listenersJournalManager.getListenersJournal(cvs_name as supportableCVS)
+                    ) {
+                        this.spawnListener(
+                            cvs_name as supportableCVS, 
+                            (listeners_journal as ListenerMeta).id
+                        );
+                    }
+                } 
+            }
+            resolve();
+        });
+    }
+
+    private restoreListenersFromConfigs(): Promise<void> {
+        return new Promise(resolve => {
+            for (const configCVS of this.nonEmptyCVSConfigs) {
                 for (
-                    const listeners_journal of 
-                    this.listenersJournalManager.getListenersJournal(cvs_name as supportableCVS)
+                    const config of (configCVS.configsArray as unknown as ConfigsCVS[])
                 ) {
-                    this.spawnListener(
-                        cvs_name as supportableCVS, 
-                        (listeners_journal as ListenerMeta).id
-                    );
+                    if (
+                        !this.ListenersMap[configCVS.name as supportableCVS]
+                            .get(configCVS.configsArray.indexOf(config))
+                    )
+                        this.spawnListener(
+                            configCVS.name as supportableCVS,
+                            configCVS.configsArray.indexOf(config)
+                        );
                 }
-            } 
-        }
+            }
+            resolve();
+        });
     }
 
     private getConfig(
@@ -145,7 +170,7 @@ export default class ListenerManager {
             id,
             listener
         );
-        console.log("trying to add", id, cvs_name);
+
         this.listenersJournalManager.addListener(
             cvs_name,
             {
@@ -162,9 +187,37 @@ export default class ListenerManager {
         id: number
     ) {
         if (this.isListenerAlive(cvs_name, id)) {
-            this.ListenersMap[cvs_name].get(id)!.stop();
+            this.stopListener(cvs_name, id);
             this.ListenersMap[cvs_name].delete(id);
         } else console.log(`The listener ${cvs_name}:${id} has already murdered.`);
+    }
+
+    private activateListener(cvs_name: supportableCVS, id: number) {
+        this.ListenersMap[cvs_name].get(id)!.spawn();
+        this.listenersJournalManager.setListenerStatus(cvs_name, id, "active");
+    }
+
+    private activateAllListeners() {
+        for (const cvs_name of Object.keys(this.ListenersMap)) {
+            this.ListenersMap[cvs_name as supportableCVS]
+                .forEach((value: Listener, id: number) => {
+                    this.activateListener(cvs_name as supportableCVS, id);
+                });
+        }
+    }
+
+    private stopListener(cvs_name: supportableCVS, id: number) {
+        this.ListenersMap[cvs_name].get(id)!.stop();
+        this.listenersJournalManager.setListenerStatus(cvs_name, id, "inactive");
+    }
+
+    private stopAllListeners() {
+        for (const cvs_name of Object.keys(this.ListenersMap)) {
+            this.ListenersMap[cvs_name as supportableCVS]
+                .forEach((value: Listener, id: number) => {
+                    this.stopListener(cvs_name as supportableCVS, id);
+                });
+        }
     }
 
     private isListenerAlive(
@@ -185,7 +238,7 @@ export default class ListenerManager {
             case "value":
                 return Array.from(this.ListenersMap[cvs_name].values()).pop();
             case "all":
-                const all = [];
+                const all = []; // [key, value]
                 all.push(Array.from(this.ListenersMap[cvs_name].keys()).pop());
                 all.push(Array.from(this.ListenersMap[cvs_name].values()).pop());
                 return all;
@@ -195,23 +248,7 @@ export default class ListenerManager {
     public getListListeners(cvs_name: supportableCVS) {}
 
     public async startListen() {
-        const listener_promises = [];
 
-        for (const configCVS of this.nonEmptyCVSConfigs) {
-            for (const config of configCVS.configsArray) {
-                const listener = this.spawnListener(
-                    configCVS.name as supportableCVS,
-                    configCVS.configsArray.indexOf(config)
-                );
-
-                if (listener) {
-                    listener_promises.push(
-                        listener.spawn()
-                    );
-                }
-            }
-        }
-
-        return Promise.allSettled(listener_promises);
+        // this.listenersJournalManager.setListenerStatus("github", 0, "active");
     }
 }
