@@ -4,10 +4,16 @@ import {
     ConfigServer
 } from "../util/types";
 import { SoundManager } from "../util/SoundManager";
+import Logger from "../util/Logger";
 
 export default class GitlabListener extends Listener {
 
-    constructor(config: ConfigGitlab, config_server: ConfigServer, soundManager: SoundManager) {
+    constructor(
+        config: ConfigGitlab, 
+        config_server: ConfigServer, 
+        soundManager: SoundManager,
+        logger: Logger
+    ) {
         super(
             "gitlab", 
             config, 
@@ -18,7 +24,8 @@ export default class GitlabListener extends Listener {
                     "PRIVATE-TOKEN": config.token
                 }
             },
-            soundManager
+            soundManager,
+            logger
         );
     }
 }

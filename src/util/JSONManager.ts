@@ -58,7 +58,6 @@ export default class JSONManager {
 
         if (override) this.base_template.all = this.content;
         else this.base_template.all = this.base_template.all.concat(this.content);
-        console.log("saving...", this.base_template);
         fs.writeFileSync(this.path, JSON.stringify(this.base_template, null, '\t'));
     }
 

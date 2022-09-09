@@ -4,10 +4,16 @@ import {
     ConfigServer
 } from "../util/types";
 import { SoundManager } from "../util/SoundManager";
+import Logger from "../util/Logger";
 
 export default class BitbucketListener extends Listener {
 
-    constructor(config: ConfigBitbucket, config_server: ConfigServer, soundManager: SoundManager) {
+    constructor(
+        config: ConfigBitbucket, 
+        config_server: ConfigServer, 
+        soundManager: SoundManager,
+        logger: Logger
+    ) {
         super(
             "bitbucket", 
             config, 
@@ -22,7 +28,8 @@ export default class BitbucketListener extends Listener {
                     password: config.app_password
                 }
             },
-            soundManager
+            soundManager,
+            logger
         );
     }
 }

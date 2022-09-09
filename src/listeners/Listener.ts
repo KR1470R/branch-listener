@@ -11,9 +11,14 @@ import {
     ConfigBitbucket,
     ConfigGitlab
 } from "../util/types";
-import { parseDate, getRandomInt } from "../util/extra";
+import { 
+    parseDate, 
+    getRandomInt, 
+    getDateType 
+} from "../util/extra";
 import { SoundManager } from "../util/SoundManager";
 import NotificationManager from "../util/NotificationManager";
+import Logger from "../util/Logger";
 
 export default abstract class Listener {
 
@@ -28,13 +33,15 @@ export default abstract class Listener {
     private interval!: NodeJS.Timer;
     private soundManager: SoundManager;
     private notificationManager: NotificationManager;
+    private logger: Logger;
 
     constructor(
         cvs_name: supportableCVS, 
         config: ConfigsCVS, 
         config_server: ConfigServer, 
         axios_config: object,
-        soundManager: SoundManager
+        soundManager: SoundManager,
+        logger: Logger
     ) {
         this.cvs_name = cvs_name;
         this.config = config;
@@ -42,6 +49,7 @@ export default abstract class Listener {
         this.axios_config = axios_config;
         this.soundManager = soundManager,
         this.notificationManager = new NotificationManager();
+        this.logger = logger;
     }
 
     public get branch_name() {
@@ -61,7 +69,7 @@ export default abstract class Listener {
             case "gitlab":
                 config = this.config as ConfigGitlab;
                 return `https://gitlab.com/api/v4/projects/${config.project_id}/repository/branches/${config.branch}`;
-            default: throw new Error(`Uknown cvs name: ${this.cvs_name}`);
+            default: this.logger.throw(`Uknown cvs name: ${this.cvs_name}`);
         }
     };
 
@@ -96,7 +104,7 @@ export default abstract class Listener {
                 data.sha = (branch as GitlabResponse).commit.id;
                 data.date = (branch as GitlabResponse).commit.created_at;
                 break;
-                default: throw new Error(`Uknown cvs name: ${this.cvs_name}`);
+                default: this.logger.throw(`Uknown cvs name: ${this.cvs_name}`);
         }
         return data;
     }
@@ -109,23 +117,11 @@ export default abstract class Listener {
             const res_commit_date = new Date(commitData.date);
             const current_date = new Date();
 
-            const commit_date = {
-                year: res_commit_date.getFullYear(),
-                month: res_commit_date.getMonth(),
-                day: res_commit_date.getDate(),
-                hour: res_commit_date.getHours(),
-                minutes: res_commit_date.getMinutes()
-            }
-            const user_date = {
-                year: current_date.getFullYear(),
-                month: current_date.getMonth(),
-                day: current_date.getDate(),
-                hour: current_date.getHours(),
-                minutes: current_date.getMinutes() 
-            }
+            const commit_date = getDateType(res_commit_date);
+            const user_date = getDateType(current_date);
 
-            console.log("commit date:", parseDate(commit_date));
-            console.log("user date:", parseDate(user_date));
+            this.logger.log("commit date:", parseDate(commit_date));
+            this.logger.log("user date:", parseDate(user_date));
 
             if (commit_date.year !== user_date.year) return Promise.resolve(false);
             if (commit_date.month !== user_date.month) return Promise.resolve(false);
@@ -133,7 +129,7 @@ export default abstract class Listener {
             if (user_date.hour > commit_date.hour) 
                 this.hours_difference = (user_date.hour - commit_date.hour) * 60;
 
-            console.log("minutes difference:", ((user_date.minutes - commit_date.minutes) + this.hours_difference));
+            this.logger.log("minutes difference:", ((user_date.minutes - commit_date.minutes) + this.hours_difference));
 
             if (
                 ((user_date.minutes - commit_date.minutes) + this.hours_difference) >= 
@@ -141,15 +137,15 @@ export default abstract class Listener {
             ) 
                 return Promise.resolve(false);
 
-            console.log("previus commit:", this.prev_commit);
-            console.log("current commit:", this.current_commit);
+            this.logger.log("previus commit:", this.prev_commit);
+            this.logger.log("current commit:", this.current_commit);
 
             if (this.current_commit !== this.prev_commit) {
                 this.prev_commit = this.current_commit;
                 this.counter = 0;
             }
 
-            console.log("counter:", this.counter);
+            this.logger.log("counter:", this.counter);
 
             if (
                 this.prev_commit === this.current_commit &&
@@ -160,14 +156,14 @@ export default abstract class Listener {
 
             return Promise.resolve(true);
         } catch (error: any) {
-            console.log(`${this.cvs_name.toUpperCase()}LISTENER ERROR:`, error.message);
+            this.logger.log(`${this.cvs_name.toUpperCase()}LISTENER ERROR:`, error.message);
             return Promise.resolve(false);
         }
     }
 
     private async listen() {
         const isSound = await this.isSoundNewCommit();
-        console.log("isSound:", isSound);
+        this.logger.log("isSound:", isSound);
 
         if (isSound) {
             this.soundManager.play(`meow${getRandomInt(1, 3)}.mp3`);
@@ -176,7 +172,7 @@ export default abstract class Listener {
                 `Hurry up to pull the ${this.branch_name}!`
             )
         }
-        console.log("\n");
+        this.logger.log("\n");
 
         return Promise.resolve();
     }

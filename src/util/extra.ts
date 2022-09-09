@@ -16,6 +16,18 @@ export const getBaseDir = () => {
     } throw new Error("Unrecognized branch listener root path! Please, reinstall the program!")
 }
 
+export const getDateType = (date: Date): DateType => {
+    const custom_date = {
+        year: date.getFullYear(),
+        month: date.getMonth(),
+        day: date.getDate(),
+        hour: date.getHours(),
+        minutes: date.getMinutes() 
+    };
+
+    return custom_date;
+}
+
 export const parseDate = (date: DateType) => {
     const monthNames = ["January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"

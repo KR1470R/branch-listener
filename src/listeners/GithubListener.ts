@@ -4,10 +4,16 @@ import {
     ConfigServer
 } from "../util/types";
 import { SoundManager } from "../util/SoundManager";
+import Logger from "../util/Logger";
 
 export default class GithubListener extends Listener {
 
-    constructor(config: ConfigGithub, config_server: ConfigServer, soundManager: SoundManager) {
+    constructor(
+        config: ConfigGithub, 
+        config_server: ConfigServer, 
+        soundManager: SoundManager,
+        logger: Logger
+    ) {
         super(
             "github", 
             config, 
@@ -19,7 +25,8 @@ export default class GithubListener extends Listener {
                     "Authorization": `${config.token}`
                 }
             },
-            soundManager
+            soundManager,
+            logger
         );
     }
 }
