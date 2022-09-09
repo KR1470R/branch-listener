@@ -12,7 +12,7 @@ export default class Logger {
     constructor (type: supportableCVS, id: number) {
         this.type = type;
         this.file_name = `${type}_${id}.log`;
-        this.base_path = `${getBaseDir()}journal/${this.type}/`;
+        this.base_path = `${getBaseDir()}journal/${this.type}/logs/`;
         this.target_file = `${this.base_path}${this.file_name}`;
     }
 

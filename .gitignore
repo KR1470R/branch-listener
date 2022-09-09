@@ -1,7 +1,16 @@
 node_modules
 .history
 dist
+
 configs/bitbucket/config.json
 configs/git/config.json
 configs/server/config.json
 configs/gitlab/config.json
+
+journal/git/listeners.json
+journal/bitbucket/listeners.json
+journal/gitlab/listeners.json
+
+journal/git/logs/*
+journal/bitbucket/logs/*
+journal/gitlab/logs/*
