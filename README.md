@@ -8,7 +8,7 @@
 </p>
 <p align="center">
   <a aria-label="branch-listener version"
-    <img alt="" src="https://badgen.net/badge/branch-listener/6.0.6/grey">
+    <img alt="" src="https://badgen.net/badge/branch-listener/6.0.7/grey">
   </a>
   <a aria-label="Node.js version">
     <img alt="" src="https://badgen.net/badge/node/>=18/green">
