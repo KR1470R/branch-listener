@@ -1,4 +1,5 @@
 import { Quiz } from "./util/Quiz";
+import { FSHierarchyRestore } from "./util/FSHierarchyObserver";
 
 const quiz = new Quiz();
 
@@ -29,5 +30,6 @@ const narroving = async () => {
     await quiz.server(true, finish);
 }
 
-narroving()
+FSHierarchyRestore()
+    .then(() => narroving())
     .then(() => console.log("branch-listener setup has been finished successfully."));

@@ -1,9 +1,12 @@
 import express from "express";
 import ListenerManager from "./listeners/ListenerManager";
 import ConfigFactory from "./util/ConfigFactory";
+import { FSHierarchyCheck } from "./util/FSHierarchyObserver";
 
 const listenerManager = new ListenerManager();
 const config_server = new ConfigFactory("server");
+
+FSHierarchyCheck();
 
 listenerManager.init()
     .then(() => {
