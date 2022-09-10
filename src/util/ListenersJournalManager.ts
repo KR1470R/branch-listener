@@ -35,15 +35,20 @@ export default class ListenersJournalManager {
         target_manager.save(true);
     }
 
-    public addListener(cvs_name: supportableCVS, listener_meta: ListenerMeta) {
-        if (this.isListenerExist(cvs_name, listener_meta.id)) {
-            // console.log(`listener with id ${listener_meta.id} is already exist!`);
-            return;
-        }
-
+    public addListener(cvs_name: supportableCVS, listener_meta: ListenerMeta, override = false) {
         const target_manager = this.managers[cvs_name];
-        target_manager.content.push(listener_meta);
-        target_manager.save(false);
+
+        if (override) target_manager.content = [listener_meta];
+        else {
+            if (this.isListenerExist(cvs_name, listener_meta.id)) {
+                // console.log(`listener with id ${listener_meta.id} is already exist!`);
+                return;
+            }
+
+            target_manager.content.push(listener_meta);
+        }
+        
+        target_manager.save(override);
     }
 
     public removeListener(cvs_name: supportableCVS, id: number) {

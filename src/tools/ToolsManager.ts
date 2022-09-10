@@ -86,16 +86,30 @@ export default class ToolsManager {
     }
 
     public async stop() {
-        if (!this.cvs_name || !this.id) throw new Error("CVS name or id was not specified!");
-        return this.listenerManager.stopListener(this.cvs_name, this.id);
+        if (this.checkCVSData())
+            return this.listenerManager.stopListener(this.cvs_name!, this.id!);
     }
 
     public async remove() {
-        if (!this.cvs_name || !this.id) throw new Error("CVS name or id was not specified!");
-        return this.listenerManager.killListener(this.cvs_name, this.id);
+        if (this.checkCVSData())
+            return this.listenerManager.killListener(this.cvs_name!, this.id!);
     }
 
     public async list() {
         console.log(this.listenerManager.getAllListListeners());
+    }
+
+    private checkCVSData() {
+        if (!this.cvs_name) {
+            console.log("CVS name was not specified!");
+            return 0;
+        }
+
+        if (!this.id && typeof this.id !== "number") {
+            console.log("Id was not specified!");
+            return 0;
+        }
+
+        return 1;
     }
 }

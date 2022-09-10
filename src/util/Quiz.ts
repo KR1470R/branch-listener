@@ -1,9 +1,11 @@
 import readline from "readline";
 import { stdin, stdout } from 'process';
 import ConfigFactory from "./ConfigFactory";
+import ListenersJournalManager from "./ListenersJournalManager";
 import { 
     default_config_server,
-    base_config_id
+    base_config_id,
+    ListenerMeta
 } from "./types";
 
 export class Quiz {
@@ -84,9 +86,12 @@ export class Quiz {
     }
 
     public async github(override: boolean, resolve?: Function) {
-        const github_config = new ConfigFactory("github");
+        const cvs_name = "github";
+        const github_config = new ConfigFactory(cvs_name);
+        const listeners_journal = new ListenersJournalManager();
 
         await github_config.init();
+        await listeners_journal.init();
     
         const username = await this.prompt(
             "Enter username: ",
@@ -119,16 +124,29 @@ export class Quiz {
             }
         );
         github_config.setProperty(base_config_id, "branch", String(branch_name));
-    
         github_config.saveAll(override);
+
+        const listener_meta: ListenerMeta = {
+            id: override ? 0 : listeners_journal.getListenersJournal(cvs_name).pop()!.id + 1,
+            status: "pending"
+        };
+
+        listeners_journal.addListener(
+            cvs_name,
+            listener_meta,
+            override
+        );
         
         if (resolve) resolve(1);
     }
 
     public async bitbucket(override: boolean, resolve?: Function) {
-        const bitbucket_config = new ConfigFactory("bitbucket");
+        const cvs_name = "bitbucket";
+        const bitbucket_config = new ConfigFactory(cvs_name);
+        const listeners_journal = new ListenersJournalManager();
 
-        bitbucket_config.init();
+        await bitbucket_config.init();
+        await listeners_journal.init();
     
         const username = await this.prompt(
             "Enter username: ",
@@ -168,17 +186,31 @@ export class Quiz {
                 if (!output) throw new Error("Branch name is necessary!"); 
             }
         );
+
         bitbucket_config.setProperty(base_config_id, "branch", String(branch_name));
-    
         bitbucket_config.saveAll(override);
     
+        const listener_meta: ListenerMeta = {
+            id: override ? 0 : listeners_journal.getListenersJournal(cvs_name).pop()!.id + 1,
+            status: "pending"
+        };
+
+        listeners_journal.addListener(
+            cvs_name,
+            listener_meta,
+            override
+        );
+
         if (resolve) resolve(1);
     }
 
     public async gitlab(override: boolean, resolve?: Function) {
-        const gitlab_config = new ConfigFactory("gitlab");
+        const cvs_name = "gitlab";
+        const gitlab_config = new ConfigFactory(cvs_name);
+        const listeners_journal = new ListenersJournalManager();
 
-        gitlab_config.init();
+        await gitlab_config.init();
+        await listeners_journal.init();
     
         const project_id = await this.prompt(
             "Enter project ID: ",
@@ -202,9 +234,20 @@ export class Quiz {
                 if (!output) throw new Error("Branch name is necessary!"); 
             }
         );
+
         gitlab_config.setProperty(base_config_id, "branch", String(branch_name));
-    
         gitlab_config.saveAll(override);
+
+        const listener_meta: ListenerMeta = {
+            id: override ? 0 : listeners_journal.getListenersJournal(cvs_name).pop()!.id + 1,
+            status: "pending"
+        };
+
+        listeners_journal.addListener(
+            cvs_name,
+            listener_meta,
+            override
+        );
         
         if (resolve) resolve(1);
     }
