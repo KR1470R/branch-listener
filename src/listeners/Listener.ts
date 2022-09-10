@@ -120,8 +120,8 @@ export default abstract class Listener {
             const commit_date = getDateType(res_commit_date);
             const user_date = getDateType(current_date);
 
-            this.logger.log("commit date:", parseDate(commit_date));
-            this.logger.log("user date:", parseDate(user_date));
+            this.logger.log(`{commit date: ${parseDate(commit_date)}}`);
+            this.logger.log(`{user date: ${parseDate(user_date)}}`);
 
             if (commit_date.year !== user_date.year) return Promise.resolve(false);
             if (commit_date.month !== user_date.month) return Promise.resolve(false);
@@ -162,23 +162,31 @@ export default abstract class Listener {
     }
 
     private async listen() {
-        const isSound = await this.isSoundNewCommit();
-        this.logger.log("isSound:", isSound);
+        try {
+            const isSound = await this.isSoundNewCommit();
+            this.logger.log("isSound:", isSound);
+    
+            if (isSound) {
+                this.soundManager.play(`meow${getRandomInt(1, 3)}.mp3`);
+                this.notificationManager.notify(
+                    `New commit in ${this.branch_name}!`, 
+                    `Hurry up to pull the ${this.branch_name}!`
+                )
+            }
 
-        if (isSound) {
-            this.soundManager.play(`meow${getRandomInt(1, 3)}.mp3`);
-            this.notificationManager.notify(
-                `New commit in ${this.branch_name}!`, 
-                `Hurry up to pull the ${this.branch_name}!`
-            )
+            this.logger.logNewLine();
+    
+            return Promise.resolve();
+        } catch (err) {
+            this.logger.throw(String(err));
         }
-        this.logger.log("\n");
-
-        return Promise.resolve();
     }
     
     public async spawn() {
-        this.interval = setInterval(this.listen, this.config_server.timer_interval);
+        this.interval = setInterval(
+            () => this.listen(), 
+            this.config_server.timer_interval
+        );
 
         return this.listen();
     }

@@ -35,7 +35,12 @@ export default class Logger {
 
         const content = `${this.date} => ${String(message)} ${other_messages.join(" ")}`;
         console.log(content);
-        fs.writeFileSync(this.target_file, content, "utf8");
+        fs.appendFileSync(this.target_file, `${content}\n`, "utf8");
+    }
+
+    public logNewLine() {
+        this.throwIfUndefinedFile();
+        fs.appendFileSync(this.target_file, `\n`, "utf8");
     }
 
     public throw(err_msg: string): never {
