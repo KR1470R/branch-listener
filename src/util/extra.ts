@@ -51,3 +51,15 @@ export const isArrayHasAnyEmptyObject = (array: object[]) => {
     
     return false;
 }
+
+export const onCloseEvent = (callback: Function) => {
+    process.on("SIGINT", () => callback());
+    process.on("SIGUSR1", () => callback());
+    process.on("SIGUSR2", () => callback());
+    process.on("uncaughtException", (err) => {
+        if (err) callback(String(err))
+    });
+    process.on("unhandledRejection", (err) => {
+        if (err) callback(String(err))
+    });
+}

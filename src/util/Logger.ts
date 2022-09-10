@@ -17,7 +17,6 @@ export default class Logger {
     }
 
     public async init(): Promise<void> {
-        console.log(this.target_file);
         if (!fs.existsSync(this.base_path))
             await fs.mkdir(this.base_path, { recursive: true }, err => {
                 if (err)

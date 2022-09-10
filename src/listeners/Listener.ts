@@ -191,8 +191,9 @@ export default abstract class Listener {
         return this.listen();
     }
 
-    public stop() {
+    public stop(reason?: string) {
         if (this.interval)
             clearInterval(this.interval);
+            this.logger.log(`Has been stopped.\n${reason ? reason : ""}`);
     }
 }

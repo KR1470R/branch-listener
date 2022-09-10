@@ -40,7 +40,7 @@ function start_listener {
     #     log "src folder not found! Please build branch-listener.";
     #     exit 1;
     # fi
-    local index_path="$BRANCH_LISTENER_MAIN_DIR/dist/src/start.js"
+    local index_path="$BRANCH_LISTENER_MAIN_DIR/dist/src/tools/start.js"
     if [ -f "$LOG_FOLDER/$LOG_FILE" ]; then
         nohup node "$index_path" &>> "$LOG_FOLDER/$LOG_FILE" &
     else 
@@ -68,15 +68,15 @@ function kill_listener {
 
 function restart_listener {
     kill_listener 
-    start_listener
+    runTool "start"
 }
 
 function setup_listener {
     log "*** SETUP LISTENER LOGS ***"
     if [ -n "$BRANCH_LISTENER_MAIN_DIR" ]; then
-        local setup_path="$BRANCH_LISTENER_MAIN_DIR/dist/src/setup.js"
+        local setup_path="$BRANCH_LISTENER_MAIN_DIR/dist/src/tools/setup.js"
     elif echo "${PWD##*/}" | grep -q "branch-listener"; then
-        local setup_path="./dist/src/setup.js"
+        local setup_path="./dist/src/tools/setup.js"
     else
         echo "uknown current working directory! please go to branch-listener repository directory!"
         exit 1
@@ -138,6 +138,32 @@ function status_listener {
     fi 
 }
 
+function list_listeners {
+    if [ -n "$BRANCH_LISTENER_MAIN_DIR" ]; then
+        local list_path="$BRANCH_LISTENER_MAIN_DIR/dist/src/tools/list.js"
+    elif echo "${PWD##*/}" | grep -q "branch-listener"; then
+        local list_path="./dist/src/tools/list.js"
+    else
+        echo "uknown current working directory! please go to branch-listener repository directory!"
+        exit 1
+    fi
+
+    node "$list_path"
+}
+
+function runTool {
+    if [ -n "$BRANCH_LISTENER_MAIN_DIR" ]; then
+        local list_path="$BRANCH_LISTENER_MAIN_DIR/dist/src/tools/runTool.js"
+    elif echo "${PWD##*/}" | grep -q "branch-listener"; then
+        local list_path="./dist/src/tools/runTool.js"
+    else
+        echo "uknown current working directory! please go to branch-listener repository directory!"
+        exit 1
+    fi
+    echo "$list_path" "$1" "$2" "$3"
+    node "$list_path" "$1" "$2" "$3"
+}
+
 function help_usage {
     log "Usage: branch-listener start | restart | kill | setup | uninstall | help"
     log '     start          Run listener on your port(default 3001)'
@@ -151,26 +177,23 @@ function help_usage {
 }
 
 function narrowing() {
-    parameter="$1"
+    tool_name="$1"
+    cvs_name="$2"
+    id="$3"
 
-    if [ "$parameter" = "start" ]; then
-        start_listener
-    elif [ "$parameter" = "restart" ]; then
+    if [ "$tool_name" = "restart" ]; then
         restart_listener
-    elif [ "$parameter" = "kill" ]; then
+    elif [ "$tool_name" = "kill" ]; then
         kill_listener
-    elif [ "$parameter" = "setup" ]; then
-        setup_listener
-    elif [ "$parameter" = "uninstall" ]; then
+    elif [ "$tool_name" = "uninstall" ]; then
         uninstall_listener
-    elif [ "$parameter" = "status" ]; then
+    elif [ "$tool_name" = "status" ]; then
         status_listener
-    elif [ "$parameter" = "help" ]; then
+    elif [ "$tool_name" = "help" ]; then
         help_usage
     else
-        log "uknown parameter!"
-        exit 1
+        runTool "$tool_name" "$cvs_name" "$id"
     fi
 }
 
-narrowing "$1"
+narrowing "$1" "$2" "$3" "$4"

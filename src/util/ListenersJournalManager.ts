@@ -1,5 +1,5 @@
 import JSONManager from "./JSONManager";
-import { getBaseDir, isArrayHasAnyEmptyObject } from "./extra";
+import { getBaseDir } from "./extra";
 import { ListenerMeta, ListenerStatus, supportableCVS } from "./types";
 
 export default class ListenersJournalManager {
@@ -37,7 +37,7 @@ export default class ListenersJournalManager {
 
     public addListener(cvs_name: supportableCVS, listener_meta: ListenerMeta) {
         if (this.isListenerExist(cvs_name, listener_meta.id)) {
-            console.log(`listener with id ${listener_meta.id} is already exist!`);
+            // console.log(`listener with id ${listener_meta.id} is already exist!`);
             return;
         }
 
@@ -58,13 +58,12 @@ export default class ListenersJournalManager {
     }
 
     public isEmpty(cvs_name: supportableCVS) {
-        console.log(cvs_name, this.managers[cvs_name].content);
         return this.managers[cvs_name].isEmpty();
     }
 
     private isListenerExist(cvs_name: supportableCVS, id: number) {
         const target_manager = this.managers[cvs_name];
-        console.log(target_manager.content)
+
         const definedListenerMeta = (target_manager.content as ListenerMeta[])  
             .filter(listener => {
                 if (!listener) return false;
@@ -78,6 +77,6 @@ export default class ListenersJournalManager {
     }
     
     public getListenersJournal(cvs_name: supportableCVS) {
-        return this.managers[cvs_name].content;
+        return this.managers[cvs_name].content as ListenerMeta[];
     }
 }

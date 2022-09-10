@@ -15,6 +15,8 @@ import {
 import { SoundManager } from "../util/SoundManager";
 import ListenersJournalManager from "../util/ListenersJournalManager";
 import Logger from "../util/Logger";
+import process from "process";
+import { onCloseEvent } from "../util/extra";
 
 export default class ListenerManager {
 
@@ -37,6 +39,8 @@ export default class ListenerManager {
         this.bitbucket_config = new ConfigFactory("bitbucket");
         this.gitlab_config = new ConfigFactory("gitlab");
         this.listenersJournalManager = new ListenersJournalManager();
+
+        onCloseEvent(this.stopAllListeners.bind(this));
     }
 
     public async init() {
@@ -185,7 +189,7 @@ export default class ListenerManager {
         return listener;
     }
 
-    private killListener(
+    public killListener(
         cvs_name: supportableCVS,
         id: number
     ) {
@@ -194,6 +198,7 @@ export default class ListenerManager {
             this.ListenersMap[cvs_name].delete(id);
             this.listenersJournalManager.removeListener(cvs_name, id);
             this.getCVSConfigManager(cvs_name).removeConfig(id);
+            console.log(`Listener ${cvs_name}:${id} has been killed.`);
         } else console.log(`The listener ${cvs_name}:${id} has already murdered.`);
     }
 
@@ -211,16 +216,16 @@ export default class ListenerManager {
         }
     }
 
-    private stopListener(cvs_name: supportableCVS, id: number) {
-        this.ListenersMap[cvs_name].get(id)!.stop();
+    public stopListener(cvs_name: supportableCVS, id: number, reason?: string) {
+        this.ListenersMap[cvs_name].get(id)!.stop(reason);
         this.listenersJournalManager.setListenerStatus(cvs_name, id, "inactive");
     }
 
-    private stopAllListeners() {
+    private stopAllListeners(reason?: string) {
         for (const cvs_name of Object.keys(this.ListenersMap)) {
             this.ListenersMap[cvs_name as supportableCVS]
                 .forEach((value: Listener, id: number) => {
-                    this.stopListener(cvs_name as supportableCVS, id);
+                    this.stopListener(cvs_name as supportableCVS, id, reason);
                 });
         }
     }
@@ -250,11 +255,35 @@ export default class ListenerManager {
         }
     }
 
-    public getListListeners(cvs_name: supportableCVS) {}
-
     public async startListen() {
         // this.killListener("gitlab", 2);
         // this.listenersJournalManager.setListenerStatus("github", 0, "active");
         this.activateAllListeners();
+    }
+
+    public getAllListListeners() {
+        const all_contents: string[] = [];
+        for (const cvs_name of Object.keys(this.ListenersMap)) {
+            const contents = [`${cvs_name.toUpperCase()}:`];
+            for (
+                const listener_meta of 
+                this.listenersJournalManager.getListenersJournal(cvs_name as supportableCVS)
+            ) {
+                const tab = " ".repeat(5);
+                console.log(listener_meta)
+                if (
+                    listener_meta && 
+                    Object.keys(listener_meta).length > 0
+                ) {
+                    contents.push(
+                        `${tab}| ${listener_meta.id}${tab}${listener_meta.status} |`
+                    );
+                } else contents.push(`${tab}empty`);
+            }
+            
+            all_contents.push(contents.join("\n"));
+        }
+
+        return all_contents.join("\n");
     }
 }
