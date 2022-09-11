@@ -1,10 +1,10 @@
 import fs from "fs";
-import { isArrayHasAnyEmptyObject } from "./extra";
+import { isArrayHasAnyEmptyObject, onCloseEvent } from "./extra";
 
 export default class JSONManager {
     
     public path!: string;
-    public content!: object[];
+    private contents!: object[];
     private content_backup!: object[];
     private base_template = {
         all: [
@@ -13,6 +13,7 @@ export default class JSONManager {
             }
         ]
     };
+    private watcher!: fs.FSWatcher;
 
     constructor (path: string) {
         this.path = path;
@@ -22,10 +23,28 @@ export default class JSONManager {
         await this.overrideIfNotValidFile();
 
         const file = fs.readFileSync(this.path, {encoding: "utf8", flag: "r"});
-        if (file) this.content = JSON.parse(file)["all"];
-        else this.content = this.base_template["all"];
+        if (file) this.contents = JSON.parse(file)["all"];
+        else this.contents = this.base_template["all"];
 
-        this.content_backup = JSON.parse(JSON.stringify(this.content));
+        this.content_backup = JSON.parse(JSON.stringify(this.contents));
+
+        //update file if it has been changed
+        this.watcher = fs.watch(this.path, "utf8", (event: string) => {
+            if (event === "change") {
+                const new_file = fs.readFileSync(this.path, {encoding: "utf8", flag: "r"});
+                if (new_file) this.contents = JSON.parse(new_file)["all"];
+            }
+        });
+
+        onCloseEvent(() => this.watcher.close.bind(this.watcher));
+    }
+
+    public get content() {
+        return this.contents;
+    }
+    
+    public set content(content) {
+        this.contents = content;
     }
 
     private checkValidation() {
@@ -56,20 +75,20 @@ export default class JSONManager {
 
         this.clearEmptyObjects();
 
-        if (override) this.base_template.all = this.content;
-        else this.base_template.all = this.base_template.all.concat(this.content);
+        if (override) this.base_template.all = this.contents;
+        else this.base_template.all = this.base_template.all.concat(this.contents);
         fs.writeFileSync(this.path, JSON.stringify(this.base_template, null, '\t'));
     }
 
     private clearEmptyObjects() {
-        if (Array.isArray(this.content)) {
-            for (const obj of this.content) {
+        if (Array.isArray(this.contents)) {
+            for (const obj of this.contents) {
                 if (
                     typeof obj !== "object" ||
                     !Object.keys(obj).length 
                 ) {
-                    this.content.slice(
-                        this.content.indexOf(obj),
+                    this.contents.slice(
+                        this.contents.indexOf(obj),
                         1
                     );
                 }
@@ -78,10 +97,10 @@ export default class JSONManager {
     }
 
     public removeSpecifiedObject(id: number) {
-        if (!this.content[id])
+        if (!this.contents[id])
             throw new Error("element is undefined");
         
-        this.content.splice(
+        this.contents.splice(
             id,
             1
         );
@@ -91,10 +110,13 @@ export default class JSONManager {
 
     public isEmpty() {
         return (
-            !this.content ||
-            this.content.length === 0 ||
-            isArrayHasAnyEmptyObject(this.content)
+            !this.contents ||
+            this.contents.length === 0 ||
+            isArrayHasAnyEmptyObject(this.contents)
         );
     }
 
+    public closeWatcher() {
+        this.watcher.close();
+    }
 }

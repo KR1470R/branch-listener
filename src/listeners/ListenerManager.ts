@@ -148,26 +148,32 @@ export default class ListenerManager {
         switch (cvs_name) {
             case "github": 
                 listener = new GithubListener(
+                    id,
                     this.getConfig(cvs_name, id) as ConfigGithub,
                     server_config_all,
                     this.soundManager, 
-                    logger
+                    logger,
+                    this.listenersJournalManager
                 );
                 break;
             case "bitbucket":
                 listener = new BitbucketListener(
+                    id,
                     this.getConfig(cvs_name, id) as ConfigBitbucket,
                     server_config_all,
                     this.soundManager,
-                    logger
+                    logger,
+                    this.listenersJournalManager
                 );
                 break;
             case "gitlab":
                 listener = new GitlabListener(
+                    id,
                     this.getConfig(cvs_name, id) as ConfigGitlab,
                     server_config_all,
                     this.soundManager,
-                    logger
+                    logger,
+                    this.listenersJournalManager
                 );
                 break;
             default: throw new Error("Uknown CVS name!");    
@@ -203,8 +209,8 @@ export default class ListenerManager {
     }
 
     private activateListener(cvs_name: supportableCVS, id: number) {
-        this.ListenersMap[cvs_name].get(id)!.spawn();
         this.listenersJournalManager.setListenerStatus(cvs_name, id, "active");
+        this.ListenersMap[cvs_name].get(id)!.spawn();
     }
 
     private activateAllListeners() {
@@ -216,9 +222,17 @@ export default class ListenerManager {
         }
     }
 
-    public stopListener(cvs_name: supportableCVS, id: number, reason?: string) {
+    public stopListener(
+        cvs_name: supportableCVS, 
+        id: number, 
+        reason?: string,
+        closeWatcher: boolean = false
+    ) {
         this.ListenersMap[cvs_name].get(id)!.stop(reason);
         this.listenersJournalManager.setListenerStatus(cvs_name, id, "inactive");
+        
+        if (closeWatcher)
+            this.listenersJournalManager.closeWatcher(cvs_name);
     }
 
     private stopAllListeners(reason?: string) {
@@ -256,8 +270,6 @@ export default class ListenerManager {
     }
 
     public async startListen() {
-        // this.killListener("gitlab", 2);
-        // this.listenersJournalManager.setListenerStatus("github", 0, "active");
         this.activateAllListeners();
     }
 

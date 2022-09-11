@@ -62,6 +62,8 @@ export default class ToolsManager {
         await definedCVSQuiz[user_specified_cvs](true);
 
         await quiz.server(true, finish);
+
+        return Promise.resolve(true);
     }
 
     public async add() {
@@ -69,7 +71,6 @@ export default class ToolsManager {
     }
 
     public async start() {
-        console.log("[start]")
         const config_server = new ConfigFactory("server");
         await config_server.init();
         console.log(`Running with config: ${JSON.stringify({
@@ -83,20 +84,25 @@ export default class ToolsManager {
         });
 
         onCloseEvent(server.close.bind(server));
+        
+        return Promise.resolve(false);
     }
 
     public async stop() {
         if (this.checkCVSData())
-            return this.listenerManager.stopListener(this.cvs_name!, this.id!);
+            await this.listenerManager.stopListener(this.cvs_name!, this.id!, undefined, true);
+        return Promise.resolve(true);
     }
 
     public async remove() {
         if (this.checkCVSData())
-            return this.listenerManager.killListener(this.cvs_name!, this.id!);
+            await this.listenerManager.killListener(this.cvs_name!, this.id!);
+        return Promise.resolve(true);
     }
 
     public async list() {
         console.log(this.listenerManager.getAllListListeners());
+        return Promise.resolve(true);
     }
 
     private checkCVSData() {

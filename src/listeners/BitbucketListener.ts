@@ -5,18 +5,22 @@ import {
 } from "../util/types";
 import { SoundManager } from "../util/SoundManager";
 import Logger from "../util/Logger";
+import ListenersJournalManager from "util/ListenersJournalManager";
 
 export default class BitbucketListener extends Listener {
 
     constructor(
-        config: ConfigBitbucket, 
+        id: number,
+        config: ConfigBitbucket,
         config_server: ConfigServer, 
         soundManager: SoundManager,
-        logger: Logger
+        logger: Logger,
+        journalManager: ListenersJournalManager
     ) {
         super(
-            "bitbucket", 
-            config, 
+            "bitbucket",
+            id, 
+            config,
             config_server, 
             {
                 headers: {
@@ -29,7 +33,8 @@ export default class BitbucketListener extends Listener {
                 }
             },
             soundManager,
-            logger
+            logger,
+            journalManager
         );
     }
 }

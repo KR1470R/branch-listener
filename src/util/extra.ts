@@ -7,8 +7,6 @@ export const getRandomInt = (min: number, max: number) => {
 }
 
 export const getBaseDir = () => {
-    // console.log("current dir:", process.cwd());
-
     if (process.env.BRANCH_LISTENER_MAIN_DIR) {
         return `${process.env.BRANCH_LISTENER_MAIN_DIR}/`
     } else if (process.cwd().endsWith("/branch-listener")) {
@@ -53,13 +51,20 @@ export const isArrayHasAnyEmptyObject = (array: object[]) => {
 }
 
 export const onCloseEvent = (callback: Function) => {
-    process.on("SIGINT", () => callback());
-    process.on("SIGUSR1", () => callback());
-    process.on("SIGUSR2", () => callback());
-    process.on("uncaughtException", (err) => {
-        if (err) callback(String(err))
-    });
-    process.on("unhandledRejection", (err) => {
-        if (err) callback(String(err))
-    });
+    const normal_exit_signals = ["SIGINT", "SIGUSR1", "SIGUSR2"];
+    const error_exit_signals = ["uncaughtException", "unhandledRejection"];
+    
+    for (const normal_signal of normal_exit_signals) {
+        process.on(normal_signal, () => {
+            callback();
+            process.exit(0);
+        });
+    }
+
+    for (const error_signal of error_exit_signals) {
+        process.on(error_signal, () => {
+            callback();
+            process.exit(1);
+        }); 
+    }
 }

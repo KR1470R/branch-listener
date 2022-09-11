@@ -19,6 +19,7 @@ import {
 import { SoundManager } from "../util/SoundManager";
 import NotificationManager from "../util/NotificationManager";
 import Logger from "../util/Logger";
+import ListenersJournalManager from "util/ListenersJournalManager";
 
 export default abstract class Listener {
 
@@ -26,6 +27,7 @@ export default abstract class Listener {
     public readonly config_server: ConfigServer; 
     public readonly axios_config: object;
     private cvs_name: supportableCVS;
+    private id: number;
     private counter: number = 0;
     private prev_commit!: string;
     private current_commit!: string;
@@ -34,22 +36,27 @@ export default abstract class Listener {
     private soundManager: SoundManager;
     private notificationManager: NotificationManager;
     private logger: Logger;
+    private journalManager: ListenersJournalManager;
 
     constructor(
-        cvs_name: supportableCVS, 
+        cvs_name: supportableCVS,
+        id: number,
         config: ConfigsCVS, 
         config_server: ConfigServer, 
         axios_config: object,
         soundManager: SoundManager,
-        logger: Logger
+        logger: Logger,
+        journalManager: ListenersJournalManager
     ) {
         this.cvs_name = cvs_name;
+        this.id = id;
         this.config = config;
         this.config_server = config_server;
         this.axios_config = axios_config;
         this.soundManager = soundManager,
         this.notificationManager = new NotificationManager();
         this.logger = logger;
+        this.journalManager = journalManager;
     }
 
     public get branch_name() {
@@ -163,6 +170,9 @@ export default abstract class Listener {
 
     private async listen() {
         try {
+            if (this.journalManager.getListenerStatus(this.cvs_name, this.id) !== "active")
+                return Promise.resolve();
+            
             const isSound = await this.isSoundNewCommit();
             this.logger.log("isSound:", isSound);
     
@@ -192,7 +202,10 @@ export default abstract class Listener {
     }
 
     public stop(reason?: string) {
-        if (this.interval)
+        if (
+            this.interval && 
+            this.journalManager.getListenerStatus(this.cvs_name, this.id) === "active"
+        )
             clearInterval(this.interval);
             this.logger.log(`Has been stopped.\n${reason ? reason : ""}`);
     }

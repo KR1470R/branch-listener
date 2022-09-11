@@ -24,6 +24,13 @@ export default class ListenersJournalManager {
         }
     }
 
+    public getListenerStatus(cvs_name: supportableCVS, id: number): ListenerStatus | never {
+        if (this.isListenerExist(cvs_name, id)) {
+            const target_manager = this.managers[cvs_name];
+            return (target_manager.content[id] as ListenerMeta).status;
+        } else throw new Error(`Listener ${cvs_name}:id doesn't exist!`);
+    }
+
     public setListenerStatus(cvs_name: supportableCVS, id: number, status: ListenerStatus) {
         if (!this.isListenerExist(cvs_name, id)) {
             console.log(`can't change status of the listener with id ${id} - not found!`);
@@ -83,5 +90,9 @@ export default class ListenersJournalManager {
     
     public getListenersJournal(cvs_name: supportableCVS) {
         return this.managers[cvs_name].content as ListenerMeta[];
+    }
+
+    public closeWatcher(cvs_name: supportableCVS) {
+        this.managers[cvs_name].closeWatcher();
     }
 }

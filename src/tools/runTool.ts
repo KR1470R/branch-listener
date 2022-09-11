@@ -6,8 +6,6 @@ const [tool_name, cvs_name, id] = process.argv.slice(2);
 if (!tool_name)
     throw new Error("Tool was not specified!");
 
-console.log(tool_name, cvs_name, id);
-
 const toolManager = new ToolsManager(
     tool_name === "setup" ? true : false,
     cvs_name as supportableCVS,
@@ -27,7 +25,10 @@ toolManager.init()
         
         return definedFunctions[
             tool_name as keyof typeof definedFunctions
-        ]();
+        ]() as Promise<boolean>;
+    })
+    .then(exit => {
+        if (exit) process.exit(0);
     })
     .catch(err => {
         throw new Error(err);
