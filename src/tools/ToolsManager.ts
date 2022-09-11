@@ -4,13 +4,14 @@ import express from "express";
 import ConfigFactory from "../util/ConfigFactory";
 import { supportableCVS } from "../util/types";
 import { Quiz } from "../util/Quiz";
-import { onCloseEvent } from "../util/extra";
+import { signalManager } from "../util/extra";
 
 export default class ToolsManager {
 
     private listenerManager: ListenerManager;
     private cvs_name?: supportableCVS;
     private id?: number;
+    private isBegining: boolean;
 
     /**
      * @param isBegining true if branch-listener runs setup.
@@ -22,16 +23,19 @@ export default class ToolsManager {
         cvs_name?: supportableCVS | undefined, 
         id?: number | undefined
     ) {
+        this.isBegining = isBegining;
         this.listenerManager = new ListenerManager();
 
         this.cvs_name = cvs_name;
         this.id = id;
 
-        if (isBegining) FSHierarchyRestore();
+        if (this.isBegining) FSHierarchyRestore();
         else FSHierarchyCheck();
     }
 
     public async init() {
+        if (this.isBegining) return Promise.resolve();
+        
         await this.listenerManager.init();
     }
 
@@ -62,8 +66,6 @@ export default class ToolsManager {
         await definedCVSQuiz[user_specified_cvs](true);
 
         await quiz.server(true, finish);
-
-        return Promise.resolve(true);
     }
 
     public async add() {
@@ -83,7 +85,7 @@ export default class ToolsManager {
             this.listenerManager.startListen();
         });
 
-        onCloseEvent(server.close.bind(server));
+        signalManager.addCallback(server.close.bind(server));
         
         return Promise.resolve(false);
     }

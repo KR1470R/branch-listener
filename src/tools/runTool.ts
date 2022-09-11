@@ -1,6 +1,7 @@
 import ToolsManager from "./ToolsManager";
 import process from "process";
 import { supportableCVS } from "../util/types";
+import { signalManager } from "../util/extra";
 
 const [tool_name, cvs_name, id] = process.argv.slice(2);
 if (!tool_name)
@@ -28,6 +29,7 @@ toolManager.init()
         ]() as Promise<boolean>;
     })
     .then(exit => {
+        signalManager.listenEvents(exit);
         if (exit) process.exit(0);
     })
     .catch(err => {

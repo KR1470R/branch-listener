@@ -80,7 +80,7 @@ export class Quiz {
         );
         config_server.setProperty(base_config_id, "volume", Number(user_volume_sound));
     
-        config_server.saveAll(override);
+        await config_server.saveAll(override);
         
         if (resolve) resolve(1);
     }
@@ -124,14 +124,14 @@ export class Quiz {
             }
         );
         github_config.setProperty(base_config_id, "branch", String(branch_name));
-        github_config.saveAll(override);
+        await github_config.saveAll(override);
 
         const listener_meta: ListenerMeta = {
             id: override ? 0 : listeners_journal.getListenersJournal(cvs_name).pop()!.id + 1,
             status: "pending"
         };
 
-        listeners_journal.addListener(
+        await listeners_journal.addListener(
             cvs_name,
             listener_meta,
             override
@@ -188,14 +188,14 @@ export class Quiz {
         );
 
         bitbucket_config.setProperty(base_config_id, "branch", String(branch_name));
-        bitbucket_config.saveAll(override);
+        await bitbucket_config.saveAll(override);
     
         const listener_meta: ListenerMeta = {
             id: override ? 0 : listeners_journal.getListenersJournal(cvs_name).pop()!.id + 1,
             status: "pending"
         };
 
-        listeners_journal.addListener(
+        await listeners_journal.addListener(
             cvs_name,
             listener_meta,
             override
@@ -236,14 +236,14 @@ export class Quiz {
         );
 
         gitlab_config.setProperty(base_config_id, "branch", String(branch_name));
-        gitlab_config.saveAll(override);
+        await gitlab_config.saveAll(override);
 
         const listener_meta: ListenerMeta = {
             id: override ? 0 : listeners_journal.getListenersJournal(cvs_name).pop()!.id + 1,
             status: "pending"
         };
 
-        listeners_journal.addListener(
+        await listeners_journal.addListener(
             cvs_name,
             listener_meta,
             override

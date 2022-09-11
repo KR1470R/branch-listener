@@ -78,8 +78,8 @@ export default class ConfigFactory {
         config[key as keyof typeof config] = value as keyof typeof config;
     }
 
-    public saveAll(override: boolean) {
-        this.manager.save(override);
+    public async saveAll(override: boolean) {
+        await this.manager.save(override);
     }
 
     private getKeys(id: number = 0): Array<string> {
@@ -126,7 +126,7 @@ export default class ConfigFactory {
         );
     }
 
-    public removeConfig(id: number) {
-        this.manager.removeSpecifiedObject(id);
+    public async removeConfig(id: number) {
+        await this.manager.removeSpecifiedObject(id);
     }
 }

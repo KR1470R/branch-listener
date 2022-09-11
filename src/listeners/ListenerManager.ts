@@ -16,7 +16,7 @@ import { SoundManager } from "../util/SoundManager";
 import ListenersJournalManager from "../util/ListenersJournalManager";
 import Logger from "../util/Logger";
 import process from "process";
-import { onCloseEvent } from "../util/extra";
+import { signalManager } from "../util/extra";
 
 export default class ListenerManager {
 
@@ -40,7 +40,7 @@ export default class ListenerManager {
         this.gitlab_config = new ConfigFactory("gitlab");
         this.listenersJournalManager = new ListenersJournalManager();
 
-        onCloseEvent(this.stopAllListeners.bind(this));
+        signalManager.addCallback(this.stopAllListeners.bind(this));
     }
 
     public async init() {
@@ -195,42 +195,48 @@ export default class ListenerManager {
         return listener;
     }
 
-    public killListener(
+    public async killListener(
         cvs_name: supportableCVS,
         id: number
     ) {
         if (this.isListenerAlive(cvs_name, id)) {
-            this.stopListener(cvs_name, id);
+            await this.stopListener(cvs_name, id);
             this.ListenersMap[cvs_name].delete(id);
-            this.listenersJournalManager.removeListener(cvs_name, id);
-            this.getCVSConfigManager(cvs_name).removeConfig(id);
+            console.log("removed from map")
+            await this.listenersJournalManager.removeListener(cvs_name, id);
+            console.log('removed from jounal');
+            await this.getCVSConfigManager(cvs_name).removeConfig(id);
+            console.log('removed config')
             console.log(`Listener ${cvs_name}:${id} has been killed.`);
         } else console.log(`The listener ${cvs_name}:${id} has already murdered.`);
     }
 
-    private activateListener(cvs_name: supportableCVS, id: number) {
-        this.listenersJournalManager.setListenerStatus(cvs_name, id, "active");
+    private async activateListener(cvs_name: supportableCVS, id: number) {
+        await this.listenersJournalManager.setListenerStatus(cvs_name, id, "active");
         this.ListenersMap[cvs_name].get(id)!.spawn();
     }
 
     private activateAllListeners() {
-        for (const cvs_name of Object.keys(this.ListenersMap)) {
-            this.ListenersMap[cvs_name as supportableCVS]
-                .forEach((value: Listener, id: number) => {
-                    this.activateListener(cvs_name as supportableCVS, id);
-                });
-        }
+        return new Promise<void>(resolve => {
+            for (const cvs_name of Object.keys(this.ListenersMap)) {
+                this.ListenersMap[cvs_name as supportableCVS]
+                    .forEach(async (value: Listener, id: number) => {
+                        await this.activateListener(cvs_name as supportableCVS, id);
+                    });
+            }
+            resolve();
+        });
     }
 
-    public stopListener(
+    public async stopListener(
         cvs_name: supportableCVS, 
         id: number, 
         reason?: string,
         closeWatcher: boolean = false
     ) {
         this.ListenersMap[cvs_name].get(id)!.stop(reason);
-        this.listenersJournalManager.setListenerStatus(cvs_name, id, "inactive");
-        
+        await this.listenersJournalManager.setListenerStatus(cvs_name, id, "inactive");
+        console.log("closeWatcher", closeWatcher);
         if (closeWatcher)
             this.listenersJournalManager.closeWatcher(cvs_name);
     }
@@ -238,8 +244,8 @@ export default class ListenerManager {
     private stopAllListeners(reason?: string) {
         for (const cvs_name of Object.keys(this.ListenersMap)) {
             this.ListenersMap[cvs_name as supportableCVS]
-                .forEach((value: Listener, id: number) => {
-                    this.stopListener(cvs_name as supportableCVS, id, reason);
+                .forEach(async (value: Listener, id: number) => {
+                    await this.stopListener(cvs_name as supportableCVS, id, reason);
                 });
         }
     }
@@ -270,7 +276,7 @@ export default class ListenerManager {
     }
 
     public async startListen() {
-        this.activateAllListeners();
+        await this.activateAllListeners();
     }
 
     public getAllListListeners() {

@@ -34,7 +34,7 @@ export default class Logger {
 
         const content = `${this.date} => ${String(message)} ${other_messages.join(" ")}`;
         console.log(content);
-        fs.appendFileSync(this.target_file, `${content}\n`, "utf8");
+        fs.appendFileSync(this.target_file, `\n${content}`, "utf8");
     }
 
     public logNewLine() {

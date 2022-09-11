@@ -207,6 +207,6 @@ export default abstract class Listener {
             this.journalManager.getListenerStatus(this.cvs_name, this.id) === "active"
         )
             clearInterval(this.interval);
-            this.logger.log(`Has been stopped.\n${reason ? reason : ""}`);
+            this.logger.log(`Has been stopped. ${reason ? reason : ""}`);
     }
 }

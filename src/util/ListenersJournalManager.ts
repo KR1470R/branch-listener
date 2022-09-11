@@ -31,7 +31,7 @@ export default class ListenersJournalManager {
         } else throw new Error(`Listener ${cvs_name}:id doesn't exist!`);
     }
 
-    public setListenerStatus(cvs_name: supportableCVS, id: number, status: ListenerStatus) {
+    public async setListenerStatus(cvs_name: supportableCVS, id: number, status: ListenerStatus) {
         if (!this.isListenerExist(cvs_name, id)) {
             console.log(`can't change status of the listener with id ${id} - not found!`);
             return;
@@ -39,10 +39,10 @@ export default class ListenersJournalManager {
 
         const target_manager = this.managers[cvs_name];
         (target_manager.content[id] as ListenerMeta).status = status;
-        target_manager.save(true);
+        await target_manager.save(true);
     }
 
-    public addListener(cvs_name: supportableCVS, listener_meta: ListenerMeta, override = false) {
+    public async addListener(cvs_name: supportableCVS, listener_meta: ListenerMeta, override = false) {
         const target_manager = this.managers[cvs_name];
 
         if (override) target_manager.content = [listener_meta];
@@ -55,10 +55,10 @@ export default class ListenersJournalManager {
             target_manager.content.push(listener_meta);
         }
         
-        target_manager.save(override);
+        await target_manager.save(override);
     }
 
-    public removeListener(cvs_name: supportableCVS, id: number) {
+    public async removeListener(cvs_name: supportableCVS, id: number) {
         if (this.isEmpty(cvs_name)) throw new Error(`${cvs_name} journal is empty!`);
 
         if (!this.isListenerExist(cvs_name, id)) {
@@ -66,7 +66,7 @@ export default class ListenersJournalManager {
             return;
         }
 
-        this.managers[cvs_name].removeSpecifiedObject(id);
+        await this.managers[cvs_name].removeSpecifiedObject(id);
     }
 
     public isEmpty(cvs_name: supportableCVS) {

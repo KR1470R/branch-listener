@@ -1,5 +1,5 @@
 import fs from "fs";
-import { isArrayHasAnyEmptyObject, onCloseEvent } from "./extra";
+import { isArrayHasAnyEmptyObject, signalManager } from "./extra";
 
 export default class JSONManager {
     
@@ -36,7 +36,7 @@ export default class JSONManager {
             }
         });
 
-        onCloseEvent(() => this.watcher.close.bind(this.watcher));
+        signalManager.addCallback(this.watcher.close.bind(this.watcher));
     }
 
     public get content() {
@@ -69,15 +69,20 @@ export default class JSONManager {
         });
     }
 
-    public save(override: boolean) {
-        if (Object.keys(this.base_template.all[0]).length === 0) 
-            this.base_template.all.pop();
+    public async save(override: boolean) {
+        return new Promise<void>((resolve, reject) => {
+            if (Object.keys(this.base_template.all[0]).length === 0) 
+                this.base_template.all.pop();
 
-        this.clearEmptyObjects();
+            this.clearEmptyObjects();
 
-        if (override) this.base_template.all = this.contents;
-        else this.base_template.all = this.base_template.all.concat(this.contents);
-        fs.writeFileSync(this.path, JSON.stringify(this.base_template, null, '\t'));
+            if (override) this.base_template.all = this.contents;
+            else this.base_template.all = this.base_template.all.concat(this.contents);
+            fs.writeFile(this.path, JSON.stringify(this.base_template, null, '\t'), err => {
+                if (err) reject(err);
+                resolve();
+            });
+        });
     }
 
     private clearEmptyObjects() {
@@ -96,7 +101,7 @@ export default class JSONManager {
         }
     }
 
-    public removeSpecifiedObject(id: number) {
+    public async removeSpecifiedObject(id: number) {
         if (!this.contents[id])
             throw new Error("element is undefined");
         
@@ -104,8 +109,10 @@ export default class JSONManager {
             id,
             1
         );
+        console.log('removed specified object:', this.contents)
+        await this.save(true);
         
-        this.save(true);
+        return Promise.resolve();
     }
 
     public isEmpty() {
@@ -117,6 +124,7 @@ export default class JSONManager {
     }
 
     public closeWatcher() {
+        console.log("closeWatcher")
         this.watcher.close();
     }
 }

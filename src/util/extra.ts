@@ -1,3 +1,4 @@
+import SignalManager from "./SignalManager";
 import { DateType } from "./types";
 
 export const getRandomInt = (min: number, max: number) => {
@@ -50,21 +51,4 @@ export const isArrayHasAnyEmptyObject = (array: object[]) => {
     return false;
 }
 
-export const onCloseEvent = (callback: Function) => {
-    const normal_exit_signals = ["SIGINT", "SIGUSR1", "SIGUSR2"];
-    const error_exit_signals = ["uncaughtException", "unhandledRejection"];
-    
-    for (const normal_signal of normal_exit_signals) {
-        process.on(normal_signal, () => {
-            callback();
-            process.exit(0);
-        });
-    }
-
-    for (const error_signal of error_exit_signals) {
-        process.on(error_signal, () => {
-            callback();
-            process.exit(1);
-        }); 
-    }
-}
+export const signalManager = new SignalManager();
