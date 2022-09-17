@@ -8,7 +8,7 @@
 </p>
 <p align="center">
   <a aria-label="branch-listener version"
-    <img alt="" src="https://badgen.net/badge/branch-listener/6.1.2/grey">
+    <img alt="" src="https://badgen.net/badge/branch-listener/7.0.0/grey">
   </a>
   <a aria-label="Node.js version">
     <img alt="" src="https://badgen.net/badge/node/>=18/green">
@@ -116,7 +116,8 @@ To uninstall branch-listener and remove all configs and settings:
 <img alt="" src="https://camo.githubusercontent.com/982edb824038d4ed388cf47101d10d06c1e9e5cc2b23b32a15ead6185e35430e/68747470733a2f2f7777772e676e752e6f72672f67726170686963732f67706c76332d6f722d6c617465722e706e67">
 
 ## To do
- 1. Add multi listeners;
+1. ~~Add multi listeners;~~ - in progress.
+2. Add encryption for config.
 
 [1]:https://github.com/KR1470R/branch-listener#why-do-you-need-it
 [2]:https://github.com/KR1470R/branch-listener#supported-control-version-systems
