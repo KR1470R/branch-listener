@@ -5,7 +5,6 @@ import {
 } from "../util/types";
 import { SoundManager } from "../util/SoundManager";
 import Logger from "../util/Logger";
-import ListenersJournalManager from "util/ListenersJournalManager";
 
 export default class GitlabListener extends Listener {
 
@@ -14,8 +13,7 @@ export default class GitlabListener extends Listener {
         config: ConfigGitlab, 
         config_server: ConfigServer, 
         soundManager: SoundManager,
-        logger: Logger,
-        journalManager: ListenersJournalManager
+        logger: Logger
     ) {
         super(
             "gitlab",
@@ -29,8 +27,7 @@ export default class GitlabListener extends Listener {
                 }
             },
             soundManager,
-            logger,
-            journalManager
+            logger
         );
     }
 }

@@ -24,11 +24,10 @@ const _createIfNotExistConfigs = async (): Promise<void> => {
 }
 
 const _createIfNotExistJournals = async (): Promise<void> => {
-    const journal_base_dir = `${base_dir}journal/`;
     const all_journals_dirs = ["github", "bitbucket", "gitlab"];
 
     for (const journal of all_journals_dirs) {
-        _createIfNotExist(`${journal_base_dir}${journal}/logs`);
+        _createIfNotExist(`${base_dir}logs/${journal}`);
     }
 }
 
@@ -60,11 +59,10 @@ const _throwIfConfigsDirNotExist = (): never | void => {
 }
 
 const _throwIfJournalsDirNotExist = (): never | void => {
-    const journal_base_dir = `${base_dir}journal/`;
     const all_journals_dirs = ["github", "bitbucket", "gitlab"];
 
     for (const journal of all_journals_dirs) {
-        _throwIfNotExist(`${journal_base_dir}${journal}/logs`)
+        _throwIfNotExist(`${base_dir}logs/${journal}`)
     }
 }
 

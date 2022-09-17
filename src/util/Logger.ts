@@ -12,21 +12,26 @@ export default class Logger {
     constructor (type: supportableCVS, id: number) {
         this.type = type;
         this.file_name = `${type}_${id}.log`;
-        this.base_path = `${getBaseDir()}journal/${this.type}/logs/`;
+        this.base_path = `${getBaseDir()}logs/`;
         this.target_file = `${this.base_path}${this.file_name}`;
     }
 
     public async init(): Promise<void> {
-        if (!fs.existsSync(this.base_path))
+        if (!fs.existsSync(this.base_path)) {
+            console.log("created folder");
             await fs.mkdir(this.base_path, { recursive: true }, err => {
                 if (err)
                     throw err;
             });
-        if (!fs.existsSync(this.target_file))
+        }
+
+        if (!fs.existsSync(this.target_file)) {
+            console.log("created", this.target_file);
             await fs.writeFile(this.target_file, "", "utf8", err => {
                 if (err)
                     throw err;
             });
+        }
     }
 
     public log(message: any, ...other_messages: any[]): void {

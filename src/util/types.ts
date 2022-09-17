@@ -1,14 +1,15 @@
 import Listener from "../listeners/Listener";
 
 export type ConfigServer = {
-    cvs: string;
     port: number;
     timer_interval: number;
     minutes_difference: number;
     volume: number;
-}
+};
 
 export type ConfigGithub = {
+    id: number;
+    status: ListenerStatus;
     username: string,
     repo: string;
     token: string;
@@ -16,18 +17,29 @@ export type ConfigGithub = {
 };
 
 export type ConfigBitbucket = {
+    id: number;
+    status: ListenerStatus;
     username: string;
     app_password: string;
     workspace: string;
     repo_slug: string;
     branch: string;
-}
+};
 
 export type ConfigGitlab = {
+    id: number;
+    status: ListenerStatus;
     project_id: string;
     token: string;
     branch: string;
-}
+};
+
+export const valid_configs_keys = {
+    "server": ["port", "timer_interval", "minutes_difference", "volume"],
+    "github": ["id", "status", "username", "repo", "token", "branch"],
+    "bitbucket": ["id", "status", "username", "app_password", "workspace", "repo_slug", "token", "branch"],
+    "gitlab": ["id", "status", "project_id", "token", "branch"]
+};
 
 export type ConfigsCVS = ConfigGithub | ConfigBitbucket | ConfigGitlab;
 
@@ -139,14 +151,14 @@ export type DateType = {
     day: number;
     hour: number;
     minutes: number; 
-}
+};
 
 export const default_config_server = {   
     "port": 3001,
     "timer_interval": 60000,
     "minutes_difference": 25,
     "volume": 50
-}
+};
 
 export const base_config_id = 0;
 

@@ -5,7 +5,6 @@ import {
 } from "../util/types";
 import { SoundManager } from "../util/SoundManager";
 import Logger from "../util/Logger";
-import ListenersJournalManager from "util/ListenersJournalManager";
 
 export default class BitbucketListener extends Listener {
 
@@ -14,8 +13,7 @@ export default class BitbucketListener extends Listener {
         config: ConfigBitbucket,
         config_server: ConfigServer, 
         soundManager: SoundManager,
-        logger: Logger,
-        journalManager: ListenersJournalManager
+        logger: Logger
     ) {
         super(
             "bitbucket",
@@ -33,8 +31,7 @@ export default class BitbucketListener extends Listener {
                 }
             },
             soundManager,
-            logger,
-            journalManager
+            logger
         );
     }
 }

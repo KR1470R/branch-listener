@@ -45,7 +45,7 @@ export default class ToolsManager {
         const finish = () => {
             quiz.closePrompt();
             return Promise.resolve(1);
-        }
+        };
     
         const definedCVSQuiz = {
             "github": quiz.github.bind(quiz),
@@ -66,22 +66,43 @@ export default class ToolsManager {
         await definedCVSQuiz[user_specified_cvs](true);
 
         await quiz.server(true, finish);
+
+        return Promise.resolve(true);
     }
 
     public async add() {
+        const quiz = new Quiz();
 
+        const definedCVSQuiz = {
+            "github": quiz.github.bind(quiz),
+            "bitbucket": quiz.bitbucket.bind(quiz),
+            "gitlab": quiz.gitlab.bind(quiz),
+        };
+
+        if (
+            !this.cvs_name ||
+            !Object.keys(definedCVSQuiz).includes(this.cvs_name)
+        ) return Promise.reject("Uknown cvs name!");
+
+        await definedCVSQuiz[this.cvs_name](false);
+
+        quiz.closePrompt();
+        return Promise.resolve(1);
     }
 
     public async start() {
         const config_server = new ConfigFactory("server");
         await config_server.init();
+        const server_properties = await config_server.getAllProperties();
         console.log(`Running with config: ${JSON.stringify({
-            ...config_server.getAllProperties(),
+            ...server_properties,
         }, null, "\t")}\n`);
 
         const app = express();
 
-        const server = app.listen(config_server.getProperty(0, "port"), () => {
+        const port = await config_server.getProperty(0, "port");
+
+        const server = app.listen(port, () => {
             this.listenerManager.startListen();
         });
 

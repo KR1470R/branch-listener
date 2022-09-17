@@ -5,7 +5,6 @@ import {
 } from "../util/types";
 import { SoundManager } from "../util/SoundManager";
 import Logger from "../util/Logger";
-import ListenersJournalManager from "util/ListenersJournalManager";
 
 export default class GithubListener extends Listener {
 
@@ -14,8 +13,7 @@ export default class GithubListener extends Listener {
         config: ConfigGithub, 
         config_server: ConfigServer, 
         soundManager: SoundManager,
-        logger: Logger,
-        journalManager: ListenersJournalManager
+        logger: Logger
     ) {
         super(
             "github",
@@ -30,8 +28,7 @@ export default class GithubListener extends Listener {
                 }
             },
             soundManager,
-            logger,
-            journalManager
+            logger
         );
     }
 }

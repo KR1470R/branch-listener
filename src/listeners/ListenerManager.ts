@@ -13,7 +13,6 @@ import {
     supportableCVS,
 } from "../util/types";
 import { SoundManager } from "../util/SoundManager";
-import ListenersJournalManager from "../util/ListenersJournalManager";
 import Logger from "../util/Logger";
 import process from "process";
 import { signalManager } from "../util/extra";
@@ -31,14 +30,12 @@ export default class ListenerManager {
     }
     private soundManager!: SoundManager;
     private nonEmptyCVSConfigs: ConfigFactory[] = [];
-    private listenersJournalManager: ListenersJournalManager;
 
     constructor() {
         this.server_config = new ConfigFactory("server");
         this.github_config = new ConfigFactory("github");
         this.bitbucket_config = new ConfigFactory("bitbucket");
         this.gitlab_config = new ConfigFactory("gitlab");
-        this.listenersJournalManager = new ListenersJournalManager();
 
         signalManager.addCallback(this.stopAllListeners.bind(this));
     }
@@ -48,22 +45,21 @@ export default class ListenerManager {
         await this.github_config.init();
         await this.bitbucket_config.init();
         await this.gitlab_config.init();
+        const volume = await this.server_config.getProperty(0, "volume");
         this.soundManager = new SoundManager(
-            Number(this.server_config.getProperty(0, "volume"))
+            Number(volume)
         );
         this.checkIsAllCVSConfigsEmpty();
-        this.checkConfigsValidation();
-        await this.listenersJournalManager.init();
-        await this.restoreListenersFromJournal();
+        await this.checkConfigsValidation();
         await this.restoreListenersFromConfigs();
     }
 
     private checkIsAllCVSConfigsEmpty() {
-        if (!this.github_config.isEmpty()) 
+        if (!this.github_config.isEmpty())
             this.nonEmptyCVSConfigs.push(this.github_config);
-        if (!this.bitbucket_config.isEmpty()) 
+        if (!this.bitbucket_config.isEmpty())
             this.nonEmptyCVSConfigs.push(this.bitbucket_config);
-        if (!this.gitlab_config.isEmpty()) 
+        if (!this.gitlab_config.isEmpty())
             this.nonEmptyCVSConfigs.push(this.gitlab_config);
         
         if (this.nonEmptyCVSConfigs.length === 0)
@@ -71,31 +67,15 @@ export default class ListenerManager {
     }
 
     private checkConfigsValidation() {
+        console.log("[checkConfigsValidation]")
         this.server_config.checkValidation();
         this.github_config.checkValidation();
         this.bitbucket_config.checkValidation();
         this.gitlab_config.checkValidation();
     }
 
-    private async restoreListenersFromJournal(): Promise<void> {
-        for (const cvs_name of Object.keys(this.ListenersMap)) {
-            if (!this.listenersJournalManager.isEmpty(cvs_name as supportableCVS)) {
-                for (
-                    const listeners_journal of 
-                    this.listenersJournalManager.getListenersJournal(cvs_name as supportableCVS)
-                ) {
-                    await this.spawnListener(
-                        cvs_name as supportableCVS, 
-                        (listeners_journal as ListenerMeta).id
-                    );
-                }
-            } 
-        }
-
-        return Promise.resolve();
-    }
-
     private async restoreListenersFromConfigs(): Promise<void> {
+        console.log("[restoreListenersFromConfigs]")
         for (const configCVS of this.nonEmptyCVSConfigs) {
             for (
                 const config of (configCVS.configsArray as unknown as ConfigsCVS[])
@@ -127,53 +107,51 @@ export default class ListenerManager {
         cvs_name: supportableCVS,
         id: number
     ) {
-        return this.getCVSConfigManager(cvs_name).getAllProperties(id) as ConfigsCVS;
+        return this.getCVSConfigManager(cvs_name).getAllProperties(id) as Promise<ConfigsCVS>;
     }
 
     private async spawnListener(
         cvs_name: supportableCVS,
         id: number,
-        status: ListenerStatus = "pending" 
     ) {
         if (this.isListenerAlive(cvs_name, id)) return;
 
-        const server_config_all = this.server_config
+        const server_config_all = await this.server_config
             .getAllProperties() as ConfigServer;
 
         let listener: Listener;
-
+        console.log(cvs_name, id)
         const logger = new Logger(cvs_name, id);
         await logger.init();
 
+        const config = await this.getConfig(cvs_name, id);
         switch (cvs_name) {
-            case "github": 
+            case "github":
+                
                 listener = new GithubListener(
                     id,
-                    this.getConfig(cvs_name, id) as ConfigGithub,
+                    config as ConfigGithub,
                     server_config_all,
                     this.soundManager, 
-                    logger,
-                    this.listenersJournalManager
+                    logger
                 );
                 break;
             case "bitbucket":
                 listener = new BitbucketListener(
                     id,
-                    this.getConfig(cvs_name, id) as ConfigBitbucket,
+                    config as ConfigBitbucket,
                     server_config_all,
                     this.soundManager,
-                    logger,
-                    this.listenersJournalManager
+                    logger
                 );
                 break;
             case "gitlab":
                 listener = new GitlabListener(
                     id,
-                    this.getConfig(cvs_name, id) as ConfigGitlab,
+                    config as ConfigGitlab,
                     server_config_all,
                     this.soundManager,
-                    logger,
-                    this.listenersJournalManager
+                    logger
                 );
                 break;
             default: throw new Error("Uknown CVS name!");    
@@ -183,15 +161,7 @@ export default class ListenerManager {
             id,
             listener
         );
-
-        this.listenersJournalManager.addListener(
-            cvs_name,
-            {
-                id,
-                status
-            }
-        );
-
+        
         return listener;
     }
 
@@ -199,33 +169,29 @@ export default class ListenerManager {
         cvs_name: supportableCVS,
         id: number
     ) {
-        if (this.isListenerAlive(cvs_name, id)) {
+        // if (this.isListenerAlive(cvs_name, id)) {
             await this.stopListener(cvs_name, id);
             this.ListenersMap[cvs_name].delete(id);
-            console.log("removed from map")
-            await this.listenersJournalManager.removeListener(cvs_name, id);
-            console.log('removed from jounal');
             await this.getCVSConfigManager(cvs_name).removeConfig(id);
-            console.log('removed config')
             console.log(`Listener ${cvs_name}:${id} has been killed.`);
-        } else console.log(`The listener ${cvs_name}:${id} has already murdered.`);
+        // } else console.log(`The listener ${cvs_name}:${id} has already murdered.`);
     }
 
     private async activateListener(cvs_name: supportableCVS, id: number) {
-        await this.listenersJournalManager.setListenerStatus(cvs_name, id, "active");
-        this.ListenersMap[cvs_name].get(id)!.spawn();
+        await this.getCVSConfigManager(cvs_name).setStatusListener(id, "active");
+        await this.ListenersMap[cvs_name].get(id)!.spawn();
+        console.log("spawned")
+        return Promise.resolve();
     }
 
-    private activateAllListeners() {
-        return new Promise<void>(resolve => {
-            for (const cvs_name of Object.keys(this.ListenersMap)) {
-                this.ListenersMap[cvs_name as supportableCVS]
-                    .forEach(async (value: Listener, id: number) => {
-                        await this.activateListener(cvs_name as supportableCVS, id);
-                    });
+    private async activateAllListeners() {
+        for (const cvs_name of Object.keys(this.ListenersMap)) {
+            for (const id of this.ListenersMap[cvs_name as supportableCVS].keys()) {
+                await this.activateListener(cvs_name as supportableCVS, id);
             }
-            resolve();
-        });
+        }
+
+        return Promise.resolve();
     }
 
     public async stopListener(
@@ -235,19 +201,23 @@ export default class ListenerManager {
         closeWatcher: boolean = false
     ) {
         this.ListenersMap[cvs_name].get(id)!.stop(reason);
-        await this.listenersJournalManager.setListenerStatus(cvs_name, id, "inactive");
-        console.log("closeWatcher", closeWatcher);
-        if (closeWatcher)
-            this.listenersJournalManager.closeWatcher(cvs_name);
+        await this.getCVSConfigManager(cvs_name).setStatusListener(id, "inactive");
+
+        return Promise.resolve();
     }
 
-    private stopAllListeners(reason?: string) {
+    private async stopAllListeners(reason?: string) {
         for (const cvs_name of Object.keys(this.ListenersMap)) {
-            this.ListenersMap[cvs_name as supportableCVS]
-                .forEach(async (value: Listener, id: number) => {
-                    await this.stopListener(cvs_name as supportableCVS, id, reason);
-                });
+            for (const id of this.ListenersMap[cvs_name as supportableCVS].keys()) {
+                await this.stopListener(
+                    cvs_name as supportableCVS, 
+                    id, 
+                    reason
+                );
+            }
         }
+
+        return Promise.resolve();
     }
 
     private isListenerAlive(
@@ -285,10 +255,9 @@ export default class ListenerManager {
             const contents = [`${cvs_name.toUpperCase()}:`];
             for (
                 const listener_meta of 
-                this.listenersJournalManager.getListenersJournal(cvs_name as supportableCVS)
+                this.getCVSConfigManager(cvs_name as supportableCVS).getAllConfigs() as ConfigsCVS[]
             ) {
-                const tab = " ".repeat(5);
-                console.log(listener_meta)
+                const tab = " ".repeat(6);
                 if (
                     listener_meta && 
                     Object.keys(listener_meta).length > 0

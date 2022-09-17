@@ -19,7 +19,6 @@ import {
 import { SoundManager } from "../util/SoundManager";
 import NotificationManager from "../util/NotificationManager";
 import Logger from "../util/Logger";
-import ListenersJournalManager from "util/ListenersJournalManager";
 
 export default abstract class Listener {
 
@@ -36,7 +35,6 @@ export default abstract class Listener {
     private soundManager: SoundManager;
     private notificationManager: NotificationManager;
     private logger: Logger;
-    private journalManager: ListenersJournalManager;
 
     constructor(
         cvs_name: supportableCVS,
@@ -46,7 +44,6 @@ export default abstract class Listener {
         axios_config: object,
         soundManager: SoundManager,
         logger: Logger,
-        journalManager: ListenersJournalManager
     ) {
         this.cvs_name = cvs_name;
         this.id = id;
@@ -56,7 +53,6 @@ export default abstract class Listener {
         this.soundManager = soundManager,
         this.notificationManager = new NotificationManager();
         this.logger = logger;
-        this.journalManager = journalManager;
     }
 
     public get branch_name() {
@@ -170,8 +166,8 @@ export default abstract class Listener {
 
     private async listen() {
         try {
-            if (this.journalManager.getListenerStatus(this.cvs_name, this.id) !== "active")
-                return Promise.resolve();
+            // if (this.journalManager.getListenerStatus(this.cvs_name, this.id) !== "active")
+            //     return Promise.resolve();
             
             const isSound = await this.isSoundNewCommit();
             this.logger.log("isSound:", isSound);
@@ -181,7 +177,7 @@ export default abstract class Listener {
                 this.notificationManager.notify(
                     `New commit in ${this.branch_name}!`, 
                     `Hurry up to pull the ${this.branch_name}!`
-                )
+                );
             }
 
             this.logger.logNewLine();
@@ -198,15 +194,17 @@ export default abstract class Listener {
             this.config_server.timer_interval
         );
 
+        this.logger.log(`${"=".repeat(8)}|Started|${"=".repeat(8)}`);
+
         return this.listen();
     }
 
     public stop(reason?: string) {
         if (
-            this.interval && 
-            this.journalManager.getListenerStatus(this.cvs_name, this.id) === "active"
+            this.interval //&& 
+            // this.journalManager.getListenerStatus(this.cvs_name, this.id) === "active"
         )
             clearInterval(this.interval);
-            this.logger.log(`Has been stopped. ${reason ? reason : ""}`);
+            this.logger.log(`Has been stopped. ${reason ? `\n${reason}` : ""}`);
     }
 }

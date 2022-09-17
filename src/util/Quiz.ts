@@ -1,11 +1,11 @@
 import readline from "readline";
 import { stdin, stdout } from 'process';
 import ConfigFactory from "./ConfigFactory";
-import ListenersJournalManager from "./ListenersJournalManager";
 import { 
     default_config_server,
     base_config_id,
-    ListenerMeta
+    ListenerMeta,
+    supportableCVS
 } from "./types";
 
 export class Quiz {
@@ -46,7 +46,7 @@ export class Quiz {
             },
             default_config_server.port
         );
-        config_server.setProperty(base_config_id, "port", user_port as string);
+        await config_server.setProperty(base_config_id, "port", user_port as string);
     
         const user_time_interval = await this.prompt(
             `Enter timer interval(default ${default_config_server.timer_interval}ms): `,
@@ -58,7 +58,7 @@ export class Quiz {
             },
             default_config_server.timer_interval
         );
-        config_server.setProperty(base_config_id, "timer_interval", Number(user_time_interval));
+        await config_server.setProperty(base_config_id, "timer_interval", Number(user_time_interval));
     
         const user_minutes_difference = await this.prompt(
             `Enter minutes difference between commit publish(default ${default_config_server.minutes_difference}): `,
@@ -68,7 +68,7 @@ export class Quiz {
             },
             default_config_server.minutes_difference
         );
-        config_server.setProperty(base_config_id, "minutes_difference", Number(user_minutes_difference));
+        await config_server.setProperty(base_config_id, "minutes_difference", Number(user_minutes_difference));
     
         const user_volume_sound = await this.prompt(
             `Enter volume sound(default ${default_config_server.volume}): `,
@@ -78,7 +78,7 @@ export class Quiz {
             },
             default_config_server.volume
         );
-        config_server.setProperty(base_config_id, "volume", Number(user_volume_sound));
+        await config_server.setProperty(base_config_id, "volume", Number(user_volume_sound));
     
         await config_server.saveAll(override);
         
@@ -88,10 +88,7 @@ export class Quiz {
     public async github(override: boolean, resolve?: Function) {
         const cvs_name = "github";
         const github_config = new ConfigFactory(cvs_name);
-        const listeners_journal = new ListenersJournalManager();
-
         await github_config.init();
-        await listeners_journal.init();
     
         const username = await this.prompt(
             "Enter username: ",
@@ -99,7 +96,7 @@ export class Quiz {
                 if (!output) throw new Error("Username is nessessary!");
             }
         );
-        github_config.setProperty(base_config_id, "username", String(username));
+        await github_config.setProperty(base_config_id, "username", String(username));
     
         const token = await this.prompt(
             "Entrer access token: ",
@@ -107,7 +104,7 @@ export class Quiz {
                 if (!output) throw new Error("Access token is neccessary");
             }
         );
-        github_config.setProperty(base_config_id, "token", String(token));
+        await github_config.setProperty(base_config_id, "token", String(token));
     
         const repository_name = await this.prompt(
             "Enter repository name: ",
@@ -115,7 +112,7 @@ export class Quiz {
                 if (!output) throw new Error("Repository name is necessary!");
             }
         );
-        github_config.setProperty(base_config_id, "repo", String(repository_name));
+        await github_config.setProperty(base_config_id, "repo", String(repository_name));
     
         const branch_name = await this.prompt(
             "Enter branch name: ",
@@ -123,19 +120,9 @@ export class Quiz {
                 if (!output) throw new Error("Branch name is necessary!"); 
             }
         );
-        github_config.setProperty(base_config_id, "branch", String(branch_name));
+        await github_config.setProperty(base_config_id, "branch", String(branch_name));
+        
         await github_config.saveAll(override);
-
-        const listener_meta: ListenerMeta = {
-            id: override ? 0 : listeners_journal.getListenersJournal(cvs_name).pop()!.id + 1,
-            status: "pending"
-        };
-
-        await listeners_journal.addListener(
-            cvs_name,
-            listener_meta,
-            override
-        );
         
         if (resolve) resolve(1);
     }
@@ -143,10 +130,7 @@ export class Quiz {
     public async bitbucket(override: boolean, resolve?: Function) {
         const cvs_name = "bitbucket";
         const bitbucket_config = new ConfigFactory(cvs_name);
-        const listeners_journal = new ListenersJournalManager();
-
         await bitbucket_config.init();
-        await listeners_journal.init();
     
         const username = await this.prompt(
             "Enter username: ",
@@ -154,7 +138,7 @@ export class Quiz {
                 if (!output) throw new Error("Username is nessessary!");
             }
         );
-        bitbucket_config.setProperty(base_config_id, "username", String(username));
+        await bitbucket_config.setProperty(base_config_id, "username", String(username));
     
         const app_password = await this.prompt(
             "Enter app password: ",
@@ -162,7 +146,7 @@ export class Quiz {
                 if (!output) throw new Error("App password is nessessary!");
             }
         );
-        bitbucket_config.setProperty(base_config_id, "app_password", String(app_password));
+        await bitbucket_config.setProperty(base_config_id, "app_password", String(app_password));
     
         const workspace_name = await this.prompt(
             "Enter workspace name: ",
@@ -170,7 +154,7 @@ export class Quiz {
                 if (!output) throw new Error("Workspace name is necessary!");
             }
         );
-        bitbucket_config.setProperty(base_config_id, "workspace", String(workspace_name));
+        await bitbucket_config.setProperty(base_config_id, "workspace", String(workspace_name));
     
         const repository_slug = await this.prompt(
             "Enter repository slug: ",
@@ -178,7 +162,7 @@ export class Quiz {
                 if (!output) throw new Error("Repository slug is necessary!");
             }
         );
-        bitbucket_config.setProperty(base_config_id, "repo_slug", String(repository_slug));
+        await bitbucket_config.setProperty(base_config_id, "repo_slug", String(repository_slug));
     
         const branch_name = await this.prompt(
             "Enter branch name: ",
@@ -187,19 +171,9 @@ export class Quiz {
             }
         );
 
-        bitbucket_config.setProperty(base_config_id, "branch", String(branch_name));
+        await bitbucket_config.setProperty(base_config_id, "branch", String(branch_name));
+        
         await bitbucket_config.saveAll(override);
-    
-        const listener_meta: ListenerMeta = {
-            id: override ? 0 : listeners_journal.getListenersJournal(cvs_name).pop()!.id + 1,
-            status: "pending"
-        };
-
-        await listeners_journal.addListener(
-            cvs_name,
-            listener_meta,
-            override
-        );
 
         if (resolve) resolve(1);
     }
@@ -207,18 +181,24 @@ export class Quiz {
     public async gitlab(override: boolean, resolve?: Function) {
         const cvs_name = "gitlab";
         const gitlab_config = new ConfigFactory(cvs_name);
-        const listeners_journal = new ListenersJournalManager();
-
         await gitlab_config.init();
-        await listeners_journal.init();
     
+        const id = override ? 0 : gitlab_config.getLastCVSConfigId();
+
+        console.log("ID:", id, override)
+        
+        if (gitlab_config.isEmptySpecified(id))
+            await gitlab_config.addEmptyTemplateCVSConfig(id);
+
+        await gitlab_config.setProperty(id, "id", id);
+
         const project_id = await this.prompt(
             "Enter project ID: ",
             (output: string | undefined) => {
                 if (!output) throw new Error("Project ID is nessessary!");
             }
         );
-        gitlab_config.setProperty(base_config_id, "project_id", String(project_id));
+        await gitlab_config.setProperty(id, "project_id", String(project_id));
     
         const token = await this.prompt(
             "Enter token: ",
@@ -226,7 +206,7 @@ export class Quiz {
                 if (!output) throw new Error("Token is nessessary!");
             }
         );
-        gitlab_config.setProperty(base_config_id, "token", String(token));
+        await gitlab_config.setProperty(id, "token", String(token));
     
         const branch_name = await this.prompt(
             "Enter branch name: ",
@@ -235,20 +215,10 @@ export class Quiz {
             }
         );
 
-        gitlab_config.setProperty(base_config_id, "branch", String(branch_name));
+        await gitlab_config.setProperty(id, "branch", String(branch_name));
+        
         await gitlab_config.saveAll(override);
 
-        const listener_meta: ListenerMeta = {
-            id: override ? 0 : listeners_journal.getListenersJournal(cvs_name).pop()!.id + 1,
-            status: "pending"
-        };
-
-        await listeners_journal.addListener(
-            cvs_name,
-            listener_meta,
-            override
-        );
-        
         if (resolve) resolve(1);
     }
 }

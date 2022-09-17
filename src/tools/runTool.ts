@@ -22,15 +22,17 @@ toolManager.init()
             "stop": toolManager.stop.bind(toolManager),
             "remove": toolManager.remove.bind(toolManager),
             "list": toolManager.list.bind(toolManager)
+            //@TODO
+            //edit
+            //restart
         };
-        
+
         return definedFunctions[
             tool_name as keyof typeof definedFunctions
         ]() as Promise<boolean>;
     })
-    .then(exit => {
-        signalManager.listenEvents(exit);
-        if (exit) process.exit(0);
+    .then((exit: boolean) => {
+        return signalManager.listenEvents(exit);
     })
     .catch(err => {
         throw new Error(err);

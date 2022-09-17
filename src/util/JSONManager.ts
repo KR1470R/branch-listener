@@ -14,6 +14,7 @@ export default class JSONManager {
         ]
     };
     private watcher!: fs.FSWatcher;
+    private saved_by_self: boolean = false;
 
     constructor (path: string) {
         this.path = path;
@@ -25,11 +26,11 @@ export default class JSONManager {
         const file = fs.readFileSync(this.path, {encoding: "utf8", flag: "r"});
         if (file) this.contents = JSON.parse(file)["all"];
         else this.contents = this.base_template["all"];
-
-        this.content_backup = JSON.parse(JSON.stringify(this.contents));
+        // this.content_backup = JSON.parse(JSON.stringify(this.contents));
 
         //update file if it has been changed
         this.watcher = fs.watch(this.path, "utf8", (event: string) => {
+            if (this.saved_by_self) return;
             if (event === "change") {
                 const new_file = fs.readFileSync(this.path, {encoding: "utf8", flag: "r"});
                 if (new_file) this.contents = JSON.parse(new_file)["all"];
@@ -70,19 +71,29 @@ export default class JSONManager {
     }
 
     public async save(override: boolean) {
-        return new Promise<void>((resolve, reject) => {
-            if (Object.keys(this.base_template.all[0]).length === 0) 
-                this.base_template.all.pop();
+        if (this.base_template.all[0] && Object.keys(this.base_template.all[0]).length === 0) 
+            this.base_template.all.shift();
 
-            this.clearEmptyObjects();
+        this.clearEmptyObjects();
 
-            if (override) this.base_template.all = this.contents;
-            else this.base_template.all = this.base_template.all.concat(this.contents);
-            fs.writeFile(this.path, JSON.stringify(this.base_template, null, '\t'), err => {
-                if (err) reject(err);
-                resolve();
-            });
-        });
+        if (override) {
+            await fs.promises.writeFile(this.path, "");
+            this.base_template.all = [this.contents[0]];
+        } else this.base_template.all = this.contents;
+        this.saved_by_self = true;
+        await fs.promises.writeFile(
+            this.path, 
+            JSON.stringify(this.base_template, null, '\t'), 
+            {
+                encoding: "utf-8",
+                flag: "w"
+            }
+        );
+
+        setTimeout(() => {
+            this.saved_by_self = false;
+        }, 2000)
+        return Promise.resolve();
     }
 
     private clearEmptyObjects() {
@@ -109,8 +120,8 @@ export default class JSONManager {
             id,
             1
         );
-        console.log('removed specified object:', this.contents)
-        await this.save(true);
+        
+        await this.save(false);
         
         return Promise.resolve();
     }
@@ -124,7 +135,6 @@ export default class JSONManager {
     }
 
     public closeWatcher() {
-        console.log("closeWatcher")
         this.watcher.close();
     }
 }
