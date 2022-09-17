@@ -198,7 +198,6 @@ export default class ListenerManager {
         cvs_name: supportableCVS, 
         id: number, 
         reason?: string,
-        closeWatcher: boolean = false
     ) {
         this.ListenersMap[cvs_name].get(id)!.stop(reason);
         await this.getCVSConfigManager(cvs_name).setStatusListener(id, "inactive");

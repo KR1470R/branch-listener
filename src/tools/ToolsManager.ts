@@ -113,7 +113,7 @@ export default class ToolsManager {
 
     public async stop() {
         if (this.checkCVSData())
-            await this.listenerManager.stopListener(this.cvs_name!, this.id!, undefined, true);
+            await this.listenerManager.stopListener(this.cvs_name!, this.id!);
         return Promise.resolve(true);
     }
 
