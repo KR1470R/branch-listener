@@ -13,10 +13,10 @@ export class Quiz {
   public prompt(
     question: string,
     callbackCheck: (answer: string) => void,
-    default_answer?: any
+    default_answer?: string
   ) {
     return new Promise((resolve) => {
-      this.input.question(question, (answer: any) => {
+      this.input.question(question, (answer: string) => {
         if (!answer) {
           if (default_answer) resolve(String(default_answer));
           else callbackCheck(answer);
@@ -37,11 +37,11 @@ export class Quiz {
 
     const user_port = await this.prompt(
       `Enter port(default ${default_config_server.port}): `,
-      (output: any) => {
+      (output: string) => {
         if (!/^\d+$/.test(output))
           throw new Error("Port must contain only digits! Try again.");
       },
-      default_config_server.port
+      String(default_config_server.port)
     );
     await config_server.setProperty(
       base_config_id,
@@ -51,7 +51,7 @@ export class Quiz {
 
     const user_time_interval = await this.prompt(
       `Enter timer interval(default ${default_config_server.timer_interval}ms): `,
-      (output: any) => {
+      (output: string) => {
         if (!/^\d+$/.test(String(output)))
           throw new Error("Timer must contain only digits! Try again.");
         if (Number(output) < 60000)
@@ -59,7 +59,7 @@ export class Quiz {
             "Timer must be larger or equal 60s. Please increase it!"
           );
       },
-      default_config_server.timer_interval
+      String(default_config_server.timer_interval)
     );
     await config_server.setProperty(
       base_config_id,
@@ -69,13 +69,13 @@ export class Quiz {
 
     const user_minutes_difference = await this.prompt(
       `Enter minutes difference between commit publish(default ${default_config_server.minutes_difference}): `,
-      (output: any) => {
+      (output: string) => {
         if (!/^\d+$/.test(String(output)))
           throw new Error(
             "Minutes difference must contain only digits! Try again."
           );
       },
-      default_config_server.minutes_difference
+      String(default_config_server.minutes_difference)
     );
     await config_server.setProperty(
       base_config_id,
@@ -85,11 +85,11 @@ export class Quiz {
 
     const user_volume_sound = await this.prompt(
       `Enter volume sound(default ${default_config_server.volume}): `,
-      (output: any) => {
+      (output: string) => {
         if (!/^\d+$/.test(String(output)))
           throw new Error("Volume must contain only digits! Try again.");
       },
-      default_config_server.volume
+      String(default_config_server.volume)
     );
     await config_server.setProperty(
       base_config_id,

@@ -31,12 +31,10 @@ export default class Logger {
     }
   }
 
-  public log(message: any, ...other_messages: any[]): void {
+  public log(message: string, ...other_messages: string[]): void {
     this.throwIfUndefinedFile();
 
-    const content = `${this.date} => ${String(message)} ${other_messages.join(
-      " "
-    )}`;
+    const content = `${this.date} => ${message} ${other_messages.join(" ")}`;
     console.log(content);
     fs.appendFileSync(this.target_file, `\n${content}`, "utf8");
   }

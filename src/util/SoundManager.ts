@@ -5,11 +5,9 @@ import { getBaseDir } from "./extra";
 export class SoundManager {
   private readonly base_path: string = `${getBaseDir()}assets/sounds/`;
   private volume: number;
-  private player: any;
+  private player = player({});
 
   constructor(volume: number) {
-    this.player = player({});
-
     if (volume <= 50 && volume > 0) {
       this.volume = 10000;
     } else if (volume >= 50 && volume < 70) {

@@ -82,8 +82,8 @@ export type GithubResponse = {
       verification: {
         verified: boolean;
         reason: string;
-        signature: any;
-        payload: any;
+        signature: object | null;
+        payload: object | null;
       };
     };
     protected: boolean;
@@ -188,3 +188,8 @@ export type ListenersMapType = {
 export type SignalCallbackType =
   | { (error?: string): Promise<void> }
   | { (): void };
+
+export type ErrorType = {
+  name: string;
+  message: string;
+};

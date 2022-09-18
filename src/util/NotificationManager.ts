@@ -23,7 +23,7 @@ export default class NotificationManager {
         icon: icon_path,
         wait: true,
       },
-      (err: any) => {
+      (err: unknown) => {
         if (err) console.log("NOTIFICATION POPUP ERROR:", err);
       }
     );

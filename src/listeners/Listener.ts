@@ -10,6 +10,7 @@ import {
   ConfigGithub,
   ConfigBitbucket,
   ConfigGitlab,
+  ErrorType,
 } from "../util/types";
 import { parseDate, getRandomInt, getDateType } from "../util/extra";
 import { SoundManager } from "../util/SoundManager";
@@ -129,7 +130,7 @@ export default abstract class Listener {
 
       this.logger.log(
         "minutes difference:",
-        user_date.minutes - commit_date.minutes + this.hours_difference
+        String(user_date.minutes - commit_date.minutes + this.hours_difference)
       );
 
       if (
@@ -146,7 +147,7 @@ export default abstract class Listener {
         this.counter = 0;
       }
 
-      this.logger.log("counter:", this.counter);
+      this.logger.log("counter:", String(this.counter));
 
       if (this.prev_commit === this.current_commit && this.counter >= 2)
         return Promise.resolve(false);
@@ -154,10 +155,10 @@ export default abstract class Listener {
       this.counter++;
 
       return Promise.resolve(true);
-    } catch (error: any) {
+    } catch (error: unknown) {
       this.logger.log(
         `${this.cvs_name.toUpperCase()}LISTENER ERROR:`,
-        error.message
+        (error as ErrorType).message
       );
       return Promise.resolve(false);
     }
@@ -165,11 +166,8 @@ export default abstract class Listener {
 
   private async listen() {
     try {
-      // if (this.journalManager.getListenerStatus(this.cvs_name, this.id) !== "active")
-      //     return Promise.resolve();
-
       const isSound = await this.isSoundNewCommit();
-      this.logger.log("isSound:", isSound);
+      this.logger.log("isSound:", String(isSound));
 
       if (isSound) {
         this.soundManager.play(`meow${getRandomInt(1, 3)}.mp3`);
