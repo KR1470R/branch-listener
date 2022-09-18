@@ -22,7 +22,6 @@ export default abstract class Listener {
   public readonly config_server: ConfigServer;
   public readonly axios_config: object;
   private cvs_name: supportableCVS;
-  private id: number;
   private counter = 0;
   private prev_commit!: string;
   private current_commit!: string;
@@ -42,7 +41,6 @@ export default abstract class Listener {
     logger: Logger
   ) {
     this.cvs_name = cvs_name;
-    this.id = id;
     this.config = config;
     this.config_server = config_server;
     this.axios_config = axios_config;
