@@ -61,10 +61,10 @@ export default abstract class Listener {
     switch (this.cvs_name) {
       case "github":
         config = this.config as ConfigGithub;
-        return `https://api.github.com/repos/${config.username}/${config.repo}/branches/${config.branch}`;
+        return `https://api.github.com/repos/${config.username}/${config.repository}/branches/${config.branch}`;
       case "bitbucket":
         config = this.config as ConfigBitbucket;
-        return `https://api.bitbucket.org/2.0/repositories/${config.workspace}/${config.repo_slug}/refs/branches/${config.branch}`;
+        return `https://api.bitbucket.org/2.0/repositories/${config.workspace}/${config.repository_slug}/refs/branches/${config.branch}`;
       case "gitlab":
         config = this.config as ConfigGitlab;
         return `https://gitlab.com/api/v4/projects/${config.project_id}/repository/branches/${config.branch}`;

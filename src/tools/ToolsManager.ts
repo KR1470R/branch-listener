@@ -131,17 +131,18 @@ export default class ToolsManager {
   }
 
   public list() {
-    console.log(this.listenerManager.getAllListListeners());
+    if (this.checkCVSData(true))
+      this.listenerManager.getListListeners(this.cvs_name!).printTable();
     return Promise.resolve(true);
   }
 
-  private checkCVSData() {
+  private checkCVSData(onlyCVS = false) {
     if (!this.cvs_name) {
       console.log("CVS name was not specified!");
       return 0;
     }
 
-    if (!this.id && typeof this.id !== "number") {
+    if (!onlyCVS && !this.id && typeof this.id !== "number") {
       console.log("Id was not specified!");
       return 0;
     }

@@ -107,17 +107,20 @@ export class Quiz {
     const github_config = new ConfigFactory(cvs_name);
     await github_config.init();
 
+    const id = override ? 0 : github_config.getLastCVSConfigId();
+
+    if (github_config.isEmptySpecified(id))
+      await github_config.addEmptyTemplateCVSConfig(id);
+
+    await github_config.setProperty(id, "id", id);
+
     const username = await this.prompt(
       "Enter username: ",
       (output: string | undefined) => {
         if (!output) throw new Error("Username is nessessary!");
       }
     );
-    await github_config.setProperty(
-      base_config_id,
-      "username",
-      String(username)
-    );
+    await github_config.setProperty(id, "username", String(username));
 
     const token = await this.prompt(
       "Entrer access token: ",
@@ -125,7 +128,7 @@ export class Quiz {
         if (!output) throw new Error("Access token is neccessary");
       }
     );
-    await github_config.setProperty(base_config_id, "token", String(token));
+    await github_config.setProperty(id, "token", String(token));
 
     const repository_name = await this.prompt(
       "Enter repository name: ",
@@ -133,11 +136,7 @@ export class Quiz {
         if (!output) throw new Error("Repository name is necessary!");
       }
     );
-    await github_config.setProperty(
-      base_config_id,
-      "repo",
-      String(repository_name)
-    );
+    await github_config.setProperty(id, "repository", String(repository_name));
 
     const branch_name = await this.prompt(
       "Enter branch name: ",
@@ -145,11 +144,7 @@ export class Quiz {
         if (!output) throw new Error("Branch name is necessary!");
       }
     );
-    await github_config.setProperty(
-      base_config_id,
-      "branch",
-      String(branch_name)
-    );
+    await github_config.setProperty(id, "branch", String(branch_name));
 
     await github_config.saveAll(override);
 
@@ -161,17 +156,20 @@ export class Quiz {
     const bitbucket_config = new ConfigFactory(cvs_name);
     await bitbucket_config.init();
 
+    const id = override ? 0 : bitbucket_config.getLastCVSConfigId();
+
+    if (bitbucket_config.isEmptySpecified(id))
+      await bitbucket_config.addEmptyTemplateCVSConfig(id);
+
+    await bitbucket_config.setProperty(id, "id", id);
+
     const username = await this.prompt(
       "Enter username: ",
       (output: string | undefined) => {
         if (!output) throw new Error("Username is nessessary!");
       }
     );
-    await bitbucket_config.setProperty(
-      base_config_id,
-      "username",
-      String(username)
-    );
+    await bitbucket_config.setProperty(id, "username", String(username));
 
     const app_password = await this.prompt(
       "Enter app password: ",
@@ -180,7 +178,7 @@ export class Quiz {
       }
     );
     await bitbucket_config.setProperty(
-      base_config_id,
+      id,
       "app_password",
       String(app_password)
     );
@@ -191,11 +189,7 @@ export class Quiz {
         if (!output) throw new Error("Workspace name is necessary!");
       }
     );
-    await bitbucket_config.setProperty(
-      base_config_id,
-      "workspace",
-      String(workspace_name)
-    );
+    await bitbucket_config.setProperty(id, "workspace", String(workspace_name));
 
     const repository_slug = await this.prompt(
       "Enter repository slug: ",
@@ -204,8 +198,8 @@ export class Quiz {
       }
     );
     await bitbucket_config.setProperty(
-      base_config_id,
-      "repo_slug",
+      id,
+      "repository_slug",
       String(repository_slug)
     );
 
@@ -216,11 +210,7 @@ export class Quiz {
       }
     );
 
-    await bitbucket_config.setProperty(
-      base_config_id,
-      "branch",
-      String(branch_name)
-    );
+    await bitbucket_config.setProperty(id, "branch", String(branch_name));
 
     await bitbucket_config.saveAll(override);
 
@@ -233,8 +223,6 @@ export class Quiz {
     await gitlab_config.init();
 
     const id = override ? 0 : gitlab_config.getLastCVSConfigId();
-
-    console.log("ID:", id, override);
 
     if (gitlab_config.isEmptySpecified(id))
       await gitlab_config.addEmptyTemplateCVSConfig(id);

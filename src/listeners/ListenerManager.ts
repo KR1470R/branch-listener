@@ -1,6 +1,6 @@
 import ConfigFactory from "../util/ConfigFactory";
 import Listener from "./Listener";
-import { ListenersMapType } from "../util/types";
+import { ListenersMapType, ListenerStatus } from "../util/types";
 import GithubListener from "./GithubListener";
 import BitbucketListener from "./BitbucketListener";
 import GitlabListener from "./GitlabListener";
@@ -15,6 +15,7 @@ import {
 import { SoundManager } from "../util/SoundManager";
 import Logger from "../util/Logger";
 import { signalManager } from "../util/extra";
+import { Table } from "console-table-printer";
 
 export default class ListenerManager {
   private readonly server_config: ConfigFactory;
@@ -65,7 +66,6 @@ export default class ListenerManager {
   }
 
   private checkConfigsValidation() {
-    console.log("[checkConfigsValidation]");
     this.server_config.checkValidation();
     this.github_config.checkValidation();
     this.bitbucket_config.checkValidation();
@@ -73,7 +73,6 @@ export default class ListenerManager {
   }
 
   private async restoreListenersFromConfigs(): Promise<void> {
-    console.log("[restoreListenersFromConfigs]");
     for (const configCVS of this.nonEmptyCVSConfigs) {
       for (const config of configCVS.configsArray as unknown as ConfigsCVS[]) {
         if (
@@ -117,7 +116,7 @@ export default class ListenerManager {
       (await this.server_config.getAllProperties()) as ConfigServer;
 
     let listener: Listener;
-    console.log(cvs_name, id);
+
     const logger = new Logger(cvs_name, id);
     await logger.init();
 
@@ -160,18 +159,17 @@ export default class ListenerManager {
   }
 
   public async killListener(cvs_name: supportableCVS, id: number) {
-    // if (this.isListenerAlive(cvs_name, id)) {
-    await this.stopListener(cvs_name, id);
-    this.ListenersMap[cvs_name].delete(id);
-    await this.getCVSConfigManager(cvs_name).removeConfig(id);
-    console.log(`Listener ${cvs_name}:${id} has been killed.`);
-    // } else console.log(`The listener ${cvs_name}:${id} has already murdered.`);
+    if (this.isListenerAlive(cvs_name, id)) {
+      await this.stopListener(cvs_name, id);
+      this.ListenersMap[cvs_name].delete(id);
+      await this.getCVSConfigManager(cvs_name).removeConfig(id);
+      console.log(`Listener ${cvs_name}:${id} has been killed.`);
+    } else console.log(`The listener ${cvs_name}:${id} not alive.`);
   }
 
   private async activateListener(cvs_name: supportableCVS, id: number) {
     await this.getCVSConfigManager(cvs_name).setStatusListener(id, "active");
     await this.ListenersMap[cvs_name].get(id)!.spawn();
-    console.log("spawned");
     return Promise.resolve();
   }
 
@@ -232,24 +230,59 @@ export default class ListenerManager {
     await this.activateAllListeners();
   }
 
-  public getAllListListeners() {
-    const all_contents: string[] = [];
-    for (const cvs_name of Object.keys(this.ListenersMap)) {
-      const contents = [`${cvs_name.toUpperCase()}:`];
-      for (const listener_meta of this.getCVSConfigManager(
-        cvs_name as supportableCVS
-      ).getAllConfigs() as ConfigsCVS[]) {
-        const tab = " ".repeat(6);
-        if (listener_meta && Object.keys(listener_meta).length > 0) {
-          contents.push(
-            `${tab}| ${listener_meta.id}${tab}${listener_meta.status} |`
-          );
-        } else contents.push(`${tab}empty`);
-      }
+  private defineCVSColumns(cvs_name: supportableCVS) {
+    const columns = {
+      github: ["id", "username", "repository", "branch", "status"],
+      bitbucket: [
+        "id",
+        "username",
+        "workspace",
+        "repository_slug",
+        "branch",
+        "status",
+      ],
+      gitlab: ["id", "project_id", "branch", "status"],
+    };
 
-      all_contents.push(contents.join("\n"));
+    return columns[cvs_name];
+  }
+
+  private defineCVSRowColor(status: ListenerStatus) {
+    const color = {
+      active: "green",
+      inactive: "red",
+      pending: "yellow",
+    };
+
+    return color[status];
+  }
+
+  public getListListeners(cvs_name: supportableCVS) {
+    const table = new Table();
+    const columns = this.defineCVSColumns(cvs_name);
+
+    table.addColumns(columns);
+
+    for (const listener_meta of this.getCVSConfigManager(
+      cvs_name as supportableCVS
+    ).getAllConfigs() as ConfigsCVS[]) {
+      if (listener_meta && Object.keys(listener_meta).length > 0) {
+        const row = {};
+
+        for (const column of columns) {
+          Object.defineProperty(row, column, {
+            value: listener_meta[column as keyof typeof listener_meta],
+          });
+        }
+
+        table.addRow(row, {
+          color: this.defineCVSRowColor(listener_meta.status),
+        });
+      }
     }
 
-    return all_contents.join("\n");
+    return table;
   }
+
+  public getListAllListeners() {}
 }

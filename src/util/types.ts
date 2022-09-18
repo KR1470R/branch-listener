@@ -11,7 +11,7 @@ export type ConfigGithub = {
   id: number;
   status: ListenerStatus;
   username: string;
-  repo: string;
+  repository: string;
   token: string;
   branch: string;
 };
@@ -22,7 +22,7 @@ export type ConfigBitbucket = {
   username: string;
   app_password: string;
   workspace: string;
-  repo_slug: string;
+  repository_slug: string;
   branch: string;
 };
 
@@ -36,14 +36,14 @@ export type ConfigGitlab = {
 
 export const valid_configs_keys = {
   server: ["port", "timer_interval", "minutes_difference", "volume"],
-  github: ["id", "status", "username", "repo", "token", "branch"],
+  github: ["id", "status", "username", "repository", "token", "branch"],
   bitbucket: [
     "id",
     "status",
     "username",
     "app_password",
     "workspace",
-    "repo_slug",
+    "repository_slug",
     "token",
     "branch",
   ],
