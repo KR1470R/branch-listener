@@ -1,5 +1,7 @@
 import fs from "fs";
 import { isArrayHasAnyEmptyObject, signalManager } from "./extra";
+import { Events } from "./extra";
+import { supportableCVS } from "./types";
 
 export default class JSONManager {
   public path!: string;
@@ -10,9 +12,11 @@ export default class JSONManager {
   };
   private watcher!: fs.FSWatcher;
   private saved_by_self = false;
+  private cvs_type?: supportableCVS;
 
-  constructor(path: string) {
+  constructor(path: string, cvs_type?: supportableCVS | undefined) {
     this.path = path;
+    this.cvs_type = cvs_type;
   }
 
   public async init() {
@@ -32,6 +36,9 @@ export default class JSONManager {
           flag: "r",
         });
         if (new_file) this.contents = JSON.parse(new_file)["all"];
+
+        if (this.cvs_type)
+          Events.emit(`${this.cvs_type}_updated`, this.contents);
       }
     });
 

@@ -3,13 +3,18 @@ import process from "process";
 import { supportableCVS } from "../util/types";
 import { signalManager } from "../util/extra";
 
-const [tool_name, cvs_name, id] = process.argv.slice(2);
+const [tool_name, cvs_name, id, key, value] = process.argv.slice(2);
 if (!tool_name) throw new Error("Tool was not specified!");
+
+if (tool_name === "edit" && (!key || !value))
+  throw new Error("Key or value has not provided!");
 
 const toolManager = new ToolsManager(
   tool_name === "setup" ? true : false,
   cvs_name as supportableCVS,
-  Number(id)
+  Number(id),
+  key,
+  value
 );
 
 toolManager
@@ -22,9 +27,7 @@ toolManager
       stop: toolManager.stop.bind(toolManager),
       remove: toolManager.remove.bind(toolManager),
       list: toolManager.list.bind(toolManager),
-      //@TODO
-      //edit
-      //restart
+      edit: toolManager.edit.bind(toolManager),
     };
 
     return definedFunctions[

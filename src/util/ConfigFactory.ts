@@ -7,6 +7,7 @@ import {
   ConfigsCVS,
   ListenerStatus,
   valid_configs_keys,
+  supportableCVS,
 } from "../util/types";
 import JSONManager from "./JSONManager";
 import { getBaseDir, isArrayHasAnyEmptyObject } from "./extra";
@@ -23,7 +24,8 @@ export default class ConfigFactory {
 
   public async init() {
     this.manager = new JSONManager(
-      `${this.base_path}${this.type}/${this.config_name}`
+      `${this.base_path}${this.type}/${this.config_name}`,
+      this.type as supportableCVS
     );
     await this.manager.init();
   }
@@ -68,6 +70,7 @@ export default class ConfigFactory {
 
   public setProperty(id = 0, key: string, value: string | number) {
     const config = this.defineConfig(id);
+
     config[key as keyof typeof config] = value as keyof typeof config;
   }
 

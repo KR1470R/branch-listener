@@ -65,11 +65,10 @@ export default class ListenerManager {
       );
   }
 
-  private checkConfigsValidation() {
-    this.server_config.checkValidation();
-    this.github_config.checkValidation();
-    this.bitbucket_config.checkValidation();
-    this.gitlab_config.checkValidation();
+  private async checkConfigsValidation() {
+    for (const config of this.nonEmptyCVSConfigs) {
+      await config.checkValidation();
+    }
   }
 
   private async restoreListenersFromConfigs(): Promise<void> {
@@ -167,13 +166,13 @@ export default class ListenerManager {
     } else console.log(`The listener ${cvs_name}:${id} not alive.`);
   }
 
-  private async activateListener(cvs_name: supportableCVS, id: number) {
+  public async activateListener(cvs_name: supportableCVS, id: number) {
     await this.getCVSConfigManager(cvs_name).setStatusListener(id, "active");
     await this.ListenersMap[cvs_name].get(id)!.spawn();
     return Promise.resolve();
   }
 
-  private async activateAllListeners() {
+  public async activateAllListeners() {
     for (const cvs_name of Object.keys(this.ListenersMap)) {
       for (const id of this.ListenersMap[cvs_name as supportableCVS].keys()) {
         await this.activateListener(cvs_name as supportableCVS, id);
@@ -224,10 +223,6 @@ export default class ListenerManager {
         all.push(Array.from(this.ListenersMap[cvs_name].values()).pop());
         return all;
     }
-  }
-
-  public async startListen() {
-    await this.activateAllListeners();
   }
 
   private defineCVSColumns(cvs_name: supportableCVS) {
@@ -284,5 +279,21 @@ export default class ListenerManager {
     return table;
   }
 
-  public getListAllListeners() {}
+  public async setListenerMeta(
+    cvs_name: supportableCVS,
+    id: number,
+    key: string,
+    value: string
+  ) {
+    const config_manager = this.getCVSConfigManager(cvs_name);
+
+    if (!config_manager.isListenerExist(id))
+      return Promise.reject("Listener does not exist!");
+
+    config_manager.setProperty(id, key, value);
+
+    await config_manager.saveAll(false);
+
+    return Promise.resolve();
+  }
 }

@@ -160,8 +160,8 @@ function runTool {
         echo "uknown current working directory! please go to branch-listener repository directory!"
         exit 1
     fi
-    echo "$list_path" "$1" "$2" "$3"
-    node "$list_path" "$1" "$2" "$3"
+    echo "$list_path" "$1" "$2" "$3" "$4" "$5"
+    node "$list_path" "$1" "$2" "$3" "$4" "$5"
 }
 
 function help_usage {
@@ -180,6 +180,8 @@ function narrowing() {
     tool_name="$1"
     cvs_name="$2"
     id="$3"
+    key="$4"
+    value="$5"
 
     if [ "$tool_name" = "restart" ]; then
         restart_listener
@@ -192,8 +194,8 @@ function narrowing() {
     elif [ "$tool_name" = "help" ]; then
         help_usage
     else
-        runTool "$tool_name" "$cvs_name" "$id"
+        runTool "$tool_name" "$cvs_name" "$id" "$key" "$value"
     fi
 }
 
-narrowing "$1" "$2" "$3" "$4"
+narrowing "$1" "$2" "$3" "$4" "$5"

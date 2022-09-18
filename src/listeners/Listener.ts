@@ -11,16 +11,22 @@ import {
   ConfigBitbucket,
   ConfigGitlab,
   ErrorType,
+  AxiosConfigs,
+  AxiosGithub,
+  AxiosBitbucket,
+  AxiosGitlab,
 } from "../util/types";
 import { parseDate, getRandomInt, getDateType } from "../util/extra";
 import { SoundManager } from "../util/SoundManager";
 import NotificationManager from "../util/NotificationManager";
 import Logger from "../util/Logger";
+import { Events } from "../util/extra";
 
 export default abstract class Listener {
-  public readonly config: ConfigsCVS;
+  public config: ConfigsCVS;
+  public readonly id: number;
   public readonly config_server: ConfigServer;
-  public readonly axios_config: object;
+  public readonly axios_config: AxiosConfigs;
   private cvs_name: supportableCVS;
   private counter = 0;
   private prev_commit!: string;
@@ -30,18 +36,20 @@ export default abstract class Listener {
   private soundManager: SoundManager;
   private notificationManager: NotificationManager;
   private logger: Logger;
+  private event_trigger_count = 0;
 
   constructor(
     cvs_name: supportableCVS,
     id: number,
     config: ConfigsCVS,
     config_server: ConfigServer,
-    axios_config: object,
+    axios_config: AxiosConfigs,
     soundManager: SoundManager,
     logger: Logger
   ) {
     this.cvs_name = cvs_name;
     this.config = config;
+    this.id = config.id;
     this.config_server = config_server;
     this.axios_config = axios_config;
     (this.soundManager = soundManager),
@@ -189,19 +197,63 @@ export default abstract class Listener {
       this.config_server.timer_interval
     );
 
-    this.logger.log(`${"=".repeat(8)}|Started|${"=".repeat(8)}`);
+    this.logger.log(`${"=".repeat(10)}|Started|${"=".repeat(10)}`);
 
     await this.listen();
+
+    Events.on(`${this.cvs_name}_updated`, (new_configs: ConfigsCVS[]) => {
+      this.event_trigger_count++;
+      if (this.event_trigger_count > 1) {
+        new_configs = new_configs.filter(
+          (config: ConfigsCVS) => config.id === this.id
+        );
+
+        if (new_configs[0]) {
+          this.config = new_configs[0] as ConfigsCVS;
+          this.update_axios();
+          if (this.config.status && this.config.status === "active")
+            this.restart();
+        }
+        this.event_trigger_count = 0;
+      }
+    });
 
     return Promise.resolve();
   }
 
   public stop(reason?: string) {
-    if (
-      this.interval //&&
-      // this.journalManager.getListenerStatus(this.cvs_name, this.id) === "active"
-    )
-      clearInterval(this.interval);
+    if (this.interval) clearInterval(this.interval);
     this.logger.log(`Has been stopped. ${reason ? `\n${reason}` : ""}`);
+  }
+
+  public async restart() {
+    if (this.interval) {
+      clearInterval(this.interval);
+      await this.spawn();
+
+      return Promise.resolve();
+    }
+  }
+
+  private update_axios() {
+    switch (this.cvs_name) {
+      case "github":
+        (this.axios_config as AxiosGithub).headers["Authorization"] = (
+          this.config as ConfigGitlab
+        ).token;
+        break;
+      case "bitbucket":
+        (this.axios_config as AxiosBitbucket).auth.username = (
+          this.config as ConfigBitbucket
+        ).username;
+        (this.axios_config as AxiosBitbucket).auth.password = (
+          this.config as ConfigBitbucket
+        ).app_password;
+        break;
+      case "gitlab":
+        (this.axios_config as AxiosGitlab).headers["PRIVATE-TOKEN"] = (
+          this.config as ConfigGitlab
+        ).token;
+    }
   }
 }

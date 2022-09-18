@@ -193,3 +193,30 @@ export type ErrorType = {
   name: string;
   message: string;
 };
+
+export type AxiosGithub = {
+  headers: {
+    Accept: string;
+    Authorization: string;
+  };
+};
+
+export type AxiosBitbucket = {
+  headers: {
+    "Content-Type": string;
+    "Access-Control-Allow-Origin": string;
+  };
+  auth: {
+    username: string;
+    password: string;
+  };
+};
+
+export type AxiosGitlab = {
+  headers: {
+    "Access-Control-Allow-Origin": string;
+    "PRIVATE-TOKEN": string;
+  };
+};
+
+export type AxiosConfigs = AxiosGithub | AxiosBitbucket | AxiosGitlab;

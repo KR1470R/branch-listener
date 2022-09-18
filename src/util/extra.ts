@@ -1,5 +1,6 @@
 import SignalManager from "./SignalManager";
 import { DateType } from "./types";
+import EventEmitter from "events";
 
 export const getRandomInt = (min: number, max: number) => {
   min = Math.ceil(min);
@@ -68,3 +69,5 @@ export const isArrayHasAnyEmptyObject = (array: object[]) => {
 };
 
 export const signalManager = new SignalManager();
+
+export const Events = new EventEmitter();

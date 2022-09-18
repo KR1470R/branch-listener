@@ -13,23 +13,31 @@ export default class ToolsManager {
   private listenerManager: ListenerManager;
   private cvs_name?: supportableCVS;
   private id?: number;
+  private key?: string;
+  private value?: string;
   private isBegining: boolean;
 
   /**
    * @param isBegining true if branch-listener runs setup.
-   * @param cvs_name?
-   * @param id?
+   * @param cvs_name? Name of CVS to interact with.
+   * @param id? ID of config of specified CVS.
+   * @param key? Key of specified config. Must be specified to use tool edit.
+   * @param value? Value that need to replace with value of specified key of config. Must be specified to use tool edit.
    */
   constructor(
     isBegining: boolean,
     cvs_name?: supportableCVS | undefined,
-    id?: number | undefined
+    id?: number | undefined,
+    key?: string | undefined,
+    value?: string | undefined
   ) {
     this.isBegining = isBegining;
     this.listenerManager = new ListenerManager();
 
     this.cvs_name = cvs_name;
     this.id = id;
+    this.key = key;
+    this.value = value;
 
     if (this.isBegining) FSHierarchyRestore();
     else FSHierarchyCheck();
@@ -110,7 +118,7 @@ export default class ToolsManager {
     const port = await config_server.getProperty(0, "port");
 
     const server = app.listen(port, () => {
-      this.listenerManager.startListen();
+      this.listenerManager.activateAllListeners();
     });
 
     signalManager.addCallback(server.close.bind(server));
@@ -148,5 +156,18 @@ export default class ToolsManager {
     }
 
     return 1;
+  }
+
+  public async edit() {
+    if (!this.checkCVSData()) return Promise.resolve(true);
+
+    await this.listenerManager.setListenerMeta(
+      this.cvs_name!,
+      this.id!,
+      this.key!,
+      this.value!
+    );
+
+    return Promise.resolve(true);
   }
 }
