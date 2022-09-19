@@ -36,7 +36,7 @@ export default class ListenerManager {
     this.bitbucket_config = new ConfigFactory("bitbucket");
     this.gitlab_config = new ConfigFactory("gitlab");
 
-    signalManager.addCallback(this.stopAllListeners.bind(this));
+    signalManager.addCallback(this.stopAllListeners.bind(this, false));
   }
 
   public async init() {
@@ -81,7 +81,8 @@ export default class ListenerManager {
         )
           await this.spawnListener(
             configCVS.name as supportableCVS,
-            configCVS.configsArray.indexOf(config)
+            configCVS.configsArray.indexOf(config),
+            false
           );
       }
     }
@@ -108,60 +109,66 @@ export default class ListenerManager {
     ) as ConfigsCVS;
   }
 
-  private async spawnListener(cvs_name: supportableCVS, id: number) {
-    if (this.isListenerAlive(cvs_name, id)) return;
+  private async spawnListener(
+    cvs_name: supportableCVS,
+    id: number,
+    withRun: boolean
+  ) {
+    if (!this.isListenerAlive(cvs_name, id)) {
+      const server_config_all =
+        (await this.server_config.getAllProperties()) as ConfigServer;
 
-    const server_config_all =
-      (await this.server_config.getAllProperties()) as ConfigServer;
+      let listener: Listener;
 
-    let listener: Listener;
+      const logger = new Logger(cvs_name, id);
+      await logger.init();
 
-    const logger = new Logger(cvs_name, id);
-    await logger.init();
+      const config = await this.getConfig(cvs_name, id);
+      switch (cvs_name) {
+        case "github":
+          listener = new GithubListener(
+            id,
+            config as ConfigGithub,
+            server_config_all,
+            this.soundManager,
+            logger
+          );
+          break;
+        case "bitbucket":
+          listener = new BitbucketListener(
+            id,
+            config as ConfigBitbucket,
+            server_config_all,
+            this.soundManager,
+            logger
+          );
+          break;
+        case "gitlab":
+          listener = new GitlabListener(
+            id,
+            config as ConfigGitlab,
+            server_config_all,
+            this.soundManager,
+            logger
+          );
+          break;
+        default:
+          throw new Error("Uknown CVS name!");
+      }
 
-    const config = await this.getConfig(cvs_name, id);
-    switch (cvs_name) {
-      case "github":
-        listener = new GithubListener(
-          id,
-          config as ConfigGithub,
-          server_config_all,
-          this.soundManager,
-          logger
-        );
-        break;
-      case "bitbucket":
-        listener = new BitbucketListener(
-          id,
-          config as ConfigBitbucket,
-          server_config_all,
-          this.soundManager,
-          logger
-        );
-        break;
-      case "gitlab":
-        listener = new GitlabListener(
-          id,
-          config as ConfigGitlab,
-          server_config_all,
-          this.soundManager,
-          logger
-        );
-        break;
-      default:
-        throw new Error("Uknown CVS name!");
+      this.ListenersMap[cvs_name].set(id, listener);
+
+      return Promise.resolve(listener);
     }
 
-    this.ListenersMap[cvs_name].set(id, listener);
+    if (withRun) await this.ListenersMap[cvs_name].get(id)!.spawn(withRun);
 
-    await listener.spawn();
-
-    return listener;
+    return Promise.resolve();
   }
 
   public async killListener(cvs_name: supportableCVS, id: number) {
     if (this.isListenerAlive(cvs_name, id)) {
-      await this.stopListener(cvs_name, id);
+      await this.stopListener(cvs_name, id, true);
       this.ListenersMap[cvs_name].delete(id);
       await this.getCVSConfigManager(cvs_name).removeConfig(id);
       console.log(`Listener ${cvs_name}:${id} has been killed.`);
@@ -175,8 +182,15 @@ export default class ListenerManager {
   }
 
   public async activateListener(cvs_name: supportableCVS, id: number) {
-    await this.activateListenerStatus(cvs_name, id);
-    await this.ListenersMap[cvs_name].get(id)!.spawn();
+    const current_status = await this.getCVSConfigManager(
+      cvs_name
+    ).getStatusListener(id);
+    console.log("current status:", current_status);
+    if (current_status !== "active") {
+      await this.activateListenerStatus(cvs_name, id);
+      await this.ListenersMap[cvs_name].get(id)!.spawn(false);
+    }
+
     return Promise.resolve();
   }
 
@@ -193,24 +207,38 @@ export default class ListenerManager {
   public async spawnAllListeners() {
     for (const cvs_name of Object.keys(this.ListenersMap)) {
       for (const id of this.ListenersMap[cvs_name as supportableCVS].keys()) {
-        await this.spawnListener(cvs_name as supportableCVS, id);
+        await this.spawnListener(cvs_name as supportableCVS, id, true);
       }
     }
 
     return Promise.resolve();
   }
 
-  public stopListener(cvs_name: supportableCVS, id: number, reason?: string) {
+  public async stopListener(
+    cvs_name: supportableCVS,
+    id: number,
+    changeStatus: boolean,
+    reason?: string
+  ) {
     this.ListenersMap[cvs_name].get(id)!.stop(reason);
-    // await this.getCVSConfigManager(cvs_name).setStatusListener(id, "inactive");
+    if (changeStatus)
+      await this.getCVSConfigManager(cvs_name).setStatusListener(
+        id,
+        "inactive"
+      );
 
     return Promise.resolve();
   }
 
-  private async stopAllListeners(reason?: string) {
+  public async stopAllListeners(changeStatus: boolean, reason?: string) {
     for (const cvs_name of Object.keys(this.ListenersMap)) {
       for (const id of this.ListenersMap[cvs_name as supportableCVS].keys()) {
-        await this.stopListener(cvs_name as supportableCVS, id, reason);
+        await this.stopListener(
+          cvs_name as supportableCVS,
+          id,
+          changeStatus,
+          reason
+        );
       }
     }
 

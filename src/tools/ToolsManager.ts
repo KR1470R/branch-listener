@@ -138,8 +138,17 @@ export default class ToolsManager {
   }
 
   public async stop() {
+    const reason = "Stopped by user.";
+
     if (this.checkCVSData())
-      await this.listenerManager.stopListener(this.cvs_name!, this.id!);
+      await this.listenerManager.stopListener(
+        this.cvs_name!,
+        this.id!,
+        true,
+        reason
+      );
+    else await this.listenerManager.stopAllListeners(true, reason);
+
     return Promise.resolve(true);
   }
 

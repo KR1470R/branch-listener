@@ -71,3 +71,14 @@ export const isArrayHasAnyEmptyObject = (array: object[]) => {
 export const signalManager = new SignalManager();
 
 export const Events = new EventEmitter();
+
+export const isArraysEqual = (a: unknown[], b: unknown[]) => {
+  if (a === b) return true;
+  if (a == null || b == null) return false;
+  if (a.length !== b.length) return false;
+
+  for (let i = 0; i < a.length; ++i) {
+    if (a[i] !== b[i]) return false;
+  }
+  return true;
+};

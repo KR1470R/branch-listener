@@ -36,7 +36,6 @@ export default abstract class Listener {
   private soundManager: SoundManager;
   private notificationManager: NotificationManager;
   private logger: Logger;
-  private event_trigger_count = 0;
 
   constructor(
     cvs_name: supportableCVS,
@@ -204,24 +203,22 @@ export default abstract class Listener {
     await this.listen();
   }
 
-  public spawn() {
-    if (this.config.status === "active") this.run("start");
+  public spawn(withRun: boolean) {
+    if (withRun && this.config.status === "active") this.run("start");
 
     Events.on(`${this.cvs_name}_updated`, async (new_configs: ConfigsCVS[]) => {
-      console.log(`${this.cvs_name}_updated`);
-      this.event_trigger_count++;
-      if (this.event_trigger_count > 1) {
-        new_configs = new_configs.filter(
-          (config: ConfigsCVS) => config.id === this.id
-        );
+      new_configs = new_configs.filter(
+        (config: ConfigsCVS) => config.id === this.id
+      );
 
-        if (new_configs[0]) {
-          this.config = new_configs[0] as ConfigsCVS;
-          this.update_axios();
-          if (this.config.status && this.config.status === "active")
-            await this.run("restart");
+      if (new_configs[0]) {
+        this.config = new_configs[0] as ConfigsCVS;
+        this.update_axios();
+        if (this.config.status && this.config.status === "active")
+          await this.run("restart");
+        else {
+          if (this.interval) clearInterval(this.interval);
         }
-        this.event_trigger_count = 0;
       }
     });
 

@@ -1,6 +1,10 @@
 import fs from "fs";
-import { isArrayHasAnyEmptyObject, signalManager } from "./extra";
-import { Events } from "./extra";
+import {
+  isArrayHasAnyEmptyObject,
+  signalManager,
+  Events,
+  isArraysEqual,
+} from "./extra";
 import { supportableCVS } from "./types";
 
 export default class JSONManager {
@@ -35,10 +39,15 @@ export default class JSONManager {
           encoding: "utf8",
           flag: "r",
         });
-        if (new_file) this.contents = JSON.parse(new_file)["all"];
+        if (new_file) {
+          const new_contents = JSON.parse(new_file)["all"];
+          if (isArraysEqual(this.contents, new_contents)) return;
 
-        if (this.cvs_type)
-          Events.emit(`${this.cvs_type}_updated`, this.contents);
+          this.contents = new_contents;
+
+          if (this.cvs_type)
+            Events.emit(`${this.cvs_type}_updated`, this.contents);
+        }
       }
     });
 
