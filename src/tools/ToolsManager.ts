@@ -150,8 +150,15 @@ export default class ToolsManager {
   }
 
   public list() {
-    if (this.checkCVSData(true))
+    if (this.checkCVSData(true)) {
       this.listenerManager.getListListeners(this.cvs_name!).printTable();
+    } else {
+      for (const key of this.listenerManager.listeners_keys) {
+        console.log(`\n${key.toUpperCase()}:`);
+        this.listenerManager.getListListeners(key).printTable();
+      }
+    }
+
     return Promise.resolve(true);
   }
 

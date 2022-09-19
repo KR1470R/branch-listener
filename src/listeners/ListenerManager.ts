@@ -310,4 +310,8 @@ export default class ListenerManager {
 
     return Promise.resolve();
   }
+
+  public get listeners_keys() {
+    return Object.keys(this.ListenersMap) as supportableCVS[];
+  }
 }
