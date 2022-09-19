@@ -191,7 +191,9 @@ export default abstract class Listener {
     }
   }
 
-  public async spawn() {
+  public async run(type: "start" | "restart") {
+    if (type === "restart") clearInterval(this.interval);
+
     this.interval = setInterval(
       () => this.listen(),
       this.config_server.timer_interval
@@ -200,8 +202,13 @@ export default abstract class Listener {
     this.logger.log(`${"=".repeat(10)}|Started|${"=".repeat(10)}`);
 
     await this.listen();
+  }
 
-    Events.on(`${this.cvs_name}_updated`, (new_configs: ConfigsCVS[]) => {
+  public spawn() {
+    if (this.config.status === "active") this.run("start");
+
+    Events.on(`${this.cvs_name}_updated`, async (new_configs: ConfigsCVS[]) => {
+      console.log(`${this.cvs_name}_updated`);
       this.event_trigger_count++;
       if (this.event_trigger_count > 1) {
         new_configs = new_configs.filter(
@@ -212,7 +219,7 @@ export default abstract class Listener {
           this.config = new_configs[0] as ConfigsCVS;
           this.update_axios();
           if (this.config.status && this.config.status === "active")
-            this.restart();
+            await this.run("restart");
         }
         this.event_trigger_count = 0;
       }
@@ -222,17 +229,9 @@ export default abstract class Listener {
   }
 
   public stop(reason?: string) {
+    if (this.config.status !== "active") return;
     if (this.interval) clearInterval(this.interval);
     this.logger.log(`Has been stopped. ${reason ? `\n${reason}` : ""}`);
-  }
-
-  public async restart() {
-    if (this.interval) {
-      clearInterval(this.interval);
-      await this.spawn();
-
-      return Promise.resolve();
-    }
   }
 
   private update_axios() {

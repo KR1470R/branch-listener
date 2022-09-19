@@ -23,6 +23,7 @@ toolManager
     const definedFunctions = {
       setup: toolManager.setup.bind(toolManager),
       add: toolManager.add.bind(toolManager),
+      run: toolManager.run.bind(toolManager),
       start: toolManager.start.bind(toolManager),
       stop: toolManager.stop.bind(toolManager),
       remove: toolManager.remove.bind(toolManager),

@@ -154,6 +154,8 @@ export default class ListenerManager {
 
     this.ListenersMap[cvs_name].set(id, listener);
 
+    await listener.spawn();
+
     return listener;
   }
 
@@ -166,8 +168,14 @@ export default class ListenerManager {
     } else console.log(`The listener ${cvs_name}:${id} not alive.`);
   }
 
-  public async activateListener(cvs_name: supportableCVS, id: number) {
+  public async activateListenerStatus(cvs_name: supportableCVS, id: number) {
     await this.getCVSConfigManager(cvs_name).setStatusListener(id, "active");
+
+    return Promise.resolve();
+  }
+
+  public async activateListener(cvs_name: supportableCVS, id: number) {
+    await this.activateListenerStatus(cvs_name, id);
     await this.ListenersMap[cvs_name].get(id)!.spawn();
     return Promise.resolve();
   }
@@ -182,13 +190,19 @@ export default class ListenerManager {
     return Promise.resolve();
   }
 
-  public async stopListener(
-    cvs_name: supportableCVS,
-    id: number,
-    reason?: string
-  ) {
+  public async spawnAllListeners() {
+    for (const cvs_name of Object.keys(this.ListenersMap)) {
+      for (const id of this.ListenersMap[cvs_name as supportableCVS].keys()) {
+        await this.spawnListener(cvs_name as supportableCVS, id);
+      }
+    }
+
+    return Promise.resolve();
+  }
+
+  public stopListener(cvs_name: supportableCVS, id: number, reason?: string) {
     this.ListenersMap[cvs_name].get(id)!.stop(reason);
-    await this.getCVSConfigManager(cvs_name).setStatusListener(id, "inactive");
+    // await this.getCVSConfigManager(cvs_name).setStatusListener(id, "inactive");
 
     return Promise.resolve();
   }

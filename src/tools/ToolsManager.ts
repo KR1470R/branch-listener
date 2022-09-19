@@ -81,6 +81,33 @@ export default class ToolsManager {
     return Promise.resolve(true);
   }
 
+  public async run() {
+    const config_server = new ConfigFactory("server");
+    await config_server.init();
+    const server_properties = await config_server.getAllProperties();
+    console.log(
+      `Running BRANCH-LISTENER-SERVER with config: ${JSON.stringify(
+        {
+          ...server_properties,
+        },
+        null,
+        "\t"
+      )}\n`
+    );
+
+    const app = express();
+
+    const port = await config_server.getProperty(0, "port");
+
+    const server = app.listen(port, () => {
+      this.listenerManager.spawnAllListeners();
+    });
+
+    signalManager.addCallback(server.close.bind(server));
+
+    return Promise.resolve(false);
+  }
+
   public async add() {
     const quiz = new Quiz();
 
@@ -100,30 +127,14 @@ export default class ToolsManager {
   }
 
   public async start() {
-    const config_server = new ConfigFactory("server");
-    await config_server.init();
-    const server_properties = await config_server.getAllProperties();
-    console.log(
-      `Running with config: ${JSON.stringify(
-        {
-          ...server_properties,
-        },
-        null,
-        "\t"
-      )}\n`
-    );
+    if (!this.checkCVSData()) {
+      await this.listenerManager.activateAllListeners();
+      return Promise.resolve(true);
+    }
 
-    const app = express();
+    await this.listenerManager.activateListenerStatus(this.cvs_name!, this.id!);
 
-    const port = await config_server.getProperty(0, "port");
-
-    const server = app.listen(port, () => {
-      this.listenerManager.activateAllListeners();
-    });
-
-    signalManager.addCallback(server.close.bind(server));
-
-    return Promise.resolve(false);
+    return Promise.resolve(true);
   }
 
   public async stop() {

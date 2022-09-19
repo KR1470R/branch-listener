@@ -187,6 +187,10 @@ export default class ConfigFactory {
     return Promise.resolve();
   }
 
+  public async getStatusListener(id: number) {
+    return (await String(this.getProperty(id, "status"))) as ListenerStatus;
+  }
+
   public isListenerExist(id: number) {
     const config = this.defineConfig(id);
 
