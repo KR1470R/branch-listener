@@ -1,26 +1,23 @@
 import notifier from "node-notifier";
-import { getBaseDir, getRandomInt } from "./extra";
-import fs from "fs";
+import { getBaseDir } from "./extra";
+import { supportableCVS } from "./types";
 
 export default class NotificationManager {
   private base_dir_icons: string;
+  private icon_path: string;
 
-  constructor() {
+  constructor(cvs_name: supportableCVS) {
     this.base_dir_icons = `${getBaseDir()}assets/icons/`;
+    this.icon_path = `${this.base_dir_icons}${cvs_name}.png`;
   }
 
   public notify(title: string, message: string) {
-    const icons_quantity = fs.readdirSync(this.base_dir_icons).length;
-    const icon_path = `${this.base_dir_icons}cat${getRandomInt(
-      1,
-      icons_quantity
-    )}.jpg`;
     notifier.notify(
       {
         title,
         message,
         sound: false,
-        icon: icon_path,
+        icon: this.icon_path,
         wait: true,
       },
       (err: unknown) => {

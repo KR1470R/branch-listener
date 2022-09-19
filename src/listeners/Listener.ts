@@ -16,7 +16,7 @@ import {
   AxiosBitbucket,
   AxiosGitlab,
 } from "../util/types";
-import { parseDate, getRandomInt, getDateType } from "../util/extra";
+import { parseDate, getDateType } from "../util/extra";
 import { SoundManager } from "../util/SoundManager";
 import NotificationManager from "../util/NotificationManager";
 import Logger from "../util/Logger";
@@ -52,7 +52,7 @@ export default abstract class Listener {
     this.config_server = config_server;
     this.axios_config = axios_config;
     (this.soundManager = soundManager),
-      (this.notificationManager = new NotificationManager());
+      (this.notificationManager = new NotificationManager(this.cvs_name));
     this.logger = logger;
   }
 
@@ -175,7 +175,7 @@ export default abstract class Listener {
       this.logger.log("isSound:", String(isSound));
 
       if (isSound) {
-        this.soundManager.play(`meow${getRandomInt(1, 3)}.mp3`);
+        this.soundManager.play(`notification_sound.mp3`);
         this.notificationManager.notify(
           `New commit in ${this.branch_name}!`,
           `Hurry up to pull the ${this.branch_name}!`
