@@ -12,7 +12,7 @@ if ! [ -d ./dist ]; then
     return 1
 fi
 
-bash ./branch-listener kill
+bash ./branch-listener kill "setup"
 
 MAIN_DIR="$HOME/.config/branch-listener"
 
@@ -51,26 +51,17 @@ fi
 
 mkdir -p "$MAIN_DIR/dist"
 cp -r ./dist/* "$MAIN_DIR/dist"
-cp -r  ./configs "$MAIN_DIR"
 cp -r ./node_modules "$MAIN_DIR"
 cp -r ./assets "$MAIN_DIR"
 cp ./branch-listener "$MAIN_DIR"
-mkdir "$MAIN_DIR/logs"
-touch "$MAIN_DIR/logs/output.log"
 
-if ! [ "$(cat  $BRANCH_LISTENER_SHELL_RC | grep 'branch-listener start')" ]; then
-    echo 'if [ $TERM = "linux" ]; then branch-listener start; fi' | tee -a "$BRANCH_LISTENER_SHELL_RC"
+# if [ -d "./configs" ]; then
+#     cp -r ./configs "$MAIN_DIR"
+# fi
+
+if ! [ "$(cat  $BRANCH_LISTENER_SHELL_RC | grep 'branch-listener run')" ]; then
+    echo 'if [ $TERM = "linux" ]; then branch-listener run; fi' | tee -a "$BRANCH_LISTENER_SHELL_RC"
 fi
-
-LOG_FOLDER="$MAIN_DIR/logs"
-LOG_FILE=output.log
-
-if ! [ -f "$LOG_FOLDER/$LOG_FILE" ]; then
-    mkdir "$LOG_FOLDER";
-    touch "$LOG_FOLDER/$LOG_FILE";
-fi
-
-branch-listener start
 
 echo "autorun of branch-listener configured successfully.";
 exit 0

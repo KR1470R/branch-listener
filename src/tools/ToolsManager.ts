@@ -171,14 +171,18 @@ export default class ToolsManager {
     return Promise.resolve(true);
   }
 
-  private checkCVSData(onlyCVS = false) {
+  private checkCVSData(onlyCVS = false, withLogs = true) {
+    const log = (msg: string) => {
+      if (withLogs) console.log(msg);
+    };
+
     if (!this.cvs_name) {
-      console.log("CVS name was not specified!");
+      log("CVS name was not specified!");
       return 0;
     }
 
     if (!onlyCVS && !this.id && typeof this.id !== "number") {
-      console.log("Id was not specified!");
+      log("Id was not specified!");
       return 0;
     }
 

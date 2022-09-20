@@ -1,6 +1,4 @@
 
-
-
 <p align="center">
 	<strong>
 		<h1 align="center">branch-listener</h1>
@@ -77,7 +75,7 @@ For gitlab: project id, token and branch name;\
     ./branch-listener setup
 After you setup **branch-listener**, you will be able to run it:
 
-    ./branch-listener start
+    ./branch-listener run
 Here we go, now the branch-listener will notify you for every commit has been pushed.\
 Logs and full-working state of branch-listener you can find in *./logs/*.\
 You may update configs manually in *./configs/*, or just run `./branch-listener setup`.\
@@ -86,21 +84,52 @@ If you've changed configs or source code(don't forget **rebuild** the project!),
     ./branch-listener restart
 
 ## Automation
-Only after you have installed it, you may need run it in background and on autostartup your system.\
+After you have built it, you may need run it in background and on autostartup your system.\
 For such purpose, you can make autorun of the branch-listener on startup system.
 
     ./autorun-setup.sh
-Now, branch-listener is running on background on port 3001 or which you was specified in installation and it will be running at startup system and will notify you about new commits!\
-After this you will be able to use **branch-listener** as util:
+Now, branch-listener is running on background on port 3001 or which you was specified at installation and it will be running at startup system and will notify you about new commits!\
+After this you will be able to use **branch-listener** as util.\
+Here is full a list of commands:
+```
+Usage: branch-listener [setup] [run] [add]  [start]
+                                  [restart] [stop] [remove] 
+                                  [list] [edit] [kill] [status]
+                                  [uninstall] [help] <args>
 
-    Usage: branch-listener start | restart | kill | setup | uninstall | status | help
-         start          Run listener on your port(default 3001)
-         restart        Restart listener
-         kill           Turn off listener
-         setup          Configure configs of listener
-         uninstall      Totally uninstall branch-listener
-         status         Get status of branch-listener daemon
-         help           Show this page
+                setup       Setups branch-listener configs. No args needed;
+
+                run         Runs Branch-listener server. No args needed;
+
+                add         Adds listener for specified CVS. Second arg is name of cvs;
+
+                start       Starts listeners. If args was not specified - runs all listeners,
+                            to start specified listener you have to write cvs name of listener
+                            as the first argument and id of the config of listener as the second;
+
+                restart     Restarts branch-listener server. No args needed;
+
+                stop        Stops listeners. The arguments works as well as for start command;
+
+                remove      Removes listeners. The arguments works as well as for start command;
+
+                list        Shows table with listeners information. 
+                            If args was not specified - shows all listeners tables.
+                            To show specified cvs listeners you need to specify cvs name as the second arg;
+
+                edit        Edits listener configs.
+                            Example: branch-listener edit gitlab 0 token ********************;
+                            You need to restart the branch-listener to get you changes to work as well;
+
+                kill        Kills branch-listener. 
+                            Stops the branch-listener server and all listeners. No args needed;
+
+                status      Outputs status of branch-listener's server. No args needed;
+
+                uninstall   Uninstalls branch-listener and removes all configs and logs. No args needed;
+
+                help        Shows this page. No args needed;
+```
 
 ## Uninstall
 To uninstall branch-listener and remove all configs and settings: 
@@ -116,8 +145,7 @@ To uninstall branch-listener and remove all configs and settings:
 <img alt="" src="https://camo.githubusercontent.com/982edb824038d4ed388cf47101d10d06c1e9e5cc2b23b32a15ead6185e35430e/68747470733a2f2f7777772e676e752e6f72672f67726170686963732f67706c76332d6f722d6c617465722e706e67">
 
 ## To do
-1. ~~Add multi listeners;~~ - in progress.
-2. Add encryption for config.
+1. Add encryption for config.
 
 [1]:https://github.com/KR1470R/branch-listener#why-do-you-need-it
 [2]:https://github.com/KR1470R/branch-listener#supported-control-version-systems

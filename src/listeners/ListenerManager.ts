@@ -185,8 +185,9 @@ export default class ListenerManager {
     const current_status = await this.getCVSConfigManager(
       cvs_name
     ).getStatusListener(id);
-    console.log("current status:", current_status);
+    console.log(`current ${cvs_name}:${id} status:`, current_status);
     if (current_status !== "active") {
+      console.log("activating...");
       await this.activateListenerStatus(cvs_name, id);
       await this.ListenersMap[cvs_name].get(id)!.spawn(false);
     }
