@@ -76,6 +76,9 @@ For gitlab: project id, token and branch name;\
 After you setup **branch-listener**, you will be able to run it:
 
     ./branch-listener run
+⚠️Attention⚠️
+The branch-listener will block your attempt to run the server if you activated over-limited amount listeners.\
+So you have to keep on mind the [CVS Request requirements][5] before you start it.\
 Here we go, now the branch-listener will notify you for every commit has been pushed.\
 Logs and full-working state of branch-listener you can find in *./logs/*.\
 You may update configs manually in *./configs/*, or just run `./branch-listener setup`.\
@@ -141,6 +144,7 @@ To uninstall branch-listener and remove all configs and settings:
 |----------------------------|-------|-------|-------|
 | Requests per-hour limit    | 1000  | 1000  | 1000  |
 | Need token or app password | Yes   | Yes   | Yes   |
+
 ## License
 <img alt="" src="https://camo.githubusercontent.com/982edb824038d4ed388cf47101d10d06c1e9e5cc2b23b32a15ead6185e35430e/68747470733a2f2f7777772e676e752e6f72672f67726170686963732f67706c76332d6f722d6c617465722e706e67">
 
