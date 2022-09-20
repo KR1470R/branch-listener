@@ -82,3 +82,5 @@ export const isArraysEqual = (a: unknown[], b: unknown[]) => {
   }
   return true;
 };
+
+export const msToSec = (ms: number) => ms / 1000;

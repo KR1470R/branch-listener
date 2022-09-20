@@ -14,7 +14,7 @@ import {
 } from "../util/types";
 import { SoundManager } from "../util/SoundManager";
 import Logger from "../util/Logger";
-import { signalManager } from "../util/extra";
+import { msToSec, signalManager } from "../util/extra";
 import { Table } from "console-table-printer";
 
 export default class ListenerManager {
@@ -161,7 +161,10 @@ export default class ListenerManager {
       return Promise.resolve(listener);
     }
 
-    if (withRun) await this.ListenersMap[cvs_name].get(id)!.spawn(withRun);
+    if (withRun) {
+      this.checkLimit(this.getCVSConfigManager(cvs_name));
+      await this.ListenersMap[cvs_name].get(id)!.spawn(withRun);
+    }
 
     return Promise.resolve();
   }
@@ -187,6 +190,7 @@ export default class ListenerManager {
     ).getStatusListener(id);
     console.log(`current ${cvs_name}:${id} status:`, current_status);
     if (current_status !== "active") {
+      this.checkLimit(this.getCVSConfigManager(cvs_name));
       console.log("activating...");
       await this.activateListenerStatus(cvs_name, id);
       await this.ListenersMap[cvs_name].get(id)!.spawn(false);
@@ -342,5 +346,31 @@ export default class ListenerManager {
 
   public get listeners_keys() {
     return Object.keys(this.ListenersMap) as supportableCVS[];
+  }
+
+  private checkLimit(config_cvs: ConfigFactory): never | void {
+    console.log("checking for listeners limit...");
+    const server_parameters =
+      this.server_config.getAllProperties() as ConfigServer;
+    const new_configs_quantity = config_cvs.configsArray.length;
+    const hour_in_sec = 3600;
+    const user_sec = msToSec(server_parameters.timer_interval);
+    const request_limit = 1000;
+    let is_reached_limit: boolean;
+
+    if (user_sec >= hour_in_sec) {
+      is_reached_limit = new_configs_quantity >= request_limit;
+    } else {
+      const times = user_sec / 60;
+      const requests_sum = times * new_configs_quantity;
+
+      is_reached_limit = requests_sum >= request_limit;
+    }
+
+    if (is_reached_limit) {
+      throw new Error(
+        "Listeners reached limit! Deactivate a few to avoid block requests and 403 error."
+      );
+    }
   }
 }
