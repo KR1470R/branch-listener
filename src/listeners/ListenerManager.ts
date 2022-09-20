@@ -356,20 +356,21 @@ export default class ListenerManager {
     const hour_in_sec = 3600;
     const user_sec = msToSec(server_parameters.timer_interval);
     const request_limit = 1000;
-    let is_reached_limit: boolean;
+    let over_limit = -1;
 
     if (user_sec >= hour_in_sec) {
-      is_reached_limit = new_configs_quantity >= request_limit;
+      over_limit = new_configs_quantity - request_limit;
     } else {
       const times = user_sec / 60;
       const requests_sum = times * new_configs_quantity;
 
-      is_reached_limit = requests_sum >= request_limit;
+      over_limit = requests_sum - request_limit;
     }
 
-    if (is_reached_limit) {
+    if (over_limit >= 0) {
       throw new Error(
-        "Listeners reached limit! Deactivate a few to avoid block requests and 403 error."
+        `Listeners reached limit!
+        \rDeactivate ${over_limit} listeners to avoid block requests and 403 error.`
       );
     }
   }
