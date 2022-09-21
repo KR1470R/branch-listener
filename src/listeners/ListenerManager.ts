@@ -74,14 +74,10 @@ export default class ListenerManager {
   private async restoreListenersFromConfigs(): Promise<void> {
     for (const configCVS of this.nonEmptyCVSConfigs) {
       for (const config of configCVS.configsArray as unknown as ConfigsCVS[]) {
-        if (
-          !this.ListenersMap[configCVS.name as supportableCVS].get(
-            configCVS.configsArray.indexOf(config)
-          )
-        )
+        if (!this.ListenersMap[configCVS.name as supportableCVS].get(config.id))
           await this.spawnListener(
             configCVS.name as supportableCVS,
-            configCVS.configsArray.indexOf(config),
+            config.id,
             false
           );
       }
@@ -115,8 +111,9 @@ export default class ListenerManager {
     withRun: boolean
   ) {
     if (!this.isListenerAlive(cvs_name, id)) {
-      const server_config_all =
-        (await this.server_config.getAllProperties()) as ConfigServer;
+      const server_config_all = (await this.server_config.getAllProperties(
+        0
+      )) as ConfigServer;
 
       let listener: Listener;
 
@@ -171,11 +168,15 @@ export default class ListenerManager {
 
   public async killListener(cvs_name: supportableCVS, id: number) {
     if (this.isListenerAlive(cvs_name, id)) {
+      console.log(
+        `The listener ${cvs_name}:${id} is alive on main server. Killing...`
+      );
       await this.stopListener(cvs_name, id, true);
       this.ListenersMap[cvs_name].delete(id);
-      await this.getCVSConfigManager(cvs_name).removeConfig(id);
-      console.log(`Listener ${cvs_name}:${id} has been killed.`);
-    } else console.log(`The listener ${cvs_name}:${id} not alive.`);
+    }
+
+    await this.getCVSConfigManager(cvs_name).removeConfig(id);
+    console.log(`Listener ${cvs_name}:${id} has been killed.`);
   }
 
   public async activateListenerStatus(cvs_name: supportableCVS, id: number) {
@@ -184,7 +185,11 @@ export default class ListenerManager {
     return Promise.resolve();
   }
 
-  public async activateListener(cvs_name: supportableCVS, id: number) {
+  public async activateListener(
+    cvs_name: supportableCVS,
+    id: number,
+    withRun: boolean
+  ) {
     const current_status = await this.getCVSConfigManager(
       cvs_name
     ).getStatusListener(id);
@@ -193,16 +198,16 @@ export default class ListenerManager {
       this.checkLimit(this.getCVSConfigManager(cvs_name));
       console.log("activating...");
       await this.activateListenerStatus(cvs_name, id);
-      await this.ListenersMap[cvs_name].get(id)!.spawn(false);
+      await this.ListenersMap[cvs_name].get(id)!.spawn(withRun);
     }
 
     return Promise.resolve();
   }
 
-  public async activateAllListeners() {
+  public async activateAllListeners(withRun = false) {
     for (const cvs_name of Object.keys(this.ListenersMap)) {
       for (const id of this.ListenersMap[cvs_name as supportableCVS].keys()) {
-        await this.activateListener(cvs_name as supportableCVS, id);
+        await this.activateListener(cvs_name as supportableCVS, id, withRun);
       }
     }
 
@@ -350,8 +355,9 @@ export default class ListenerManager {
 
   private checkLimit(config_cvs: ConfigFactory): never | void {
     console.log("checking for listeners limit...");
-    const server_parameters =
-      this.server_config.getAllProperties() as ConfigServer;
+    const server_parameters = this.server_config.getAllProperties(
+      0
+    ) as ConfigServer;
     const new_configs_quantity = config_cvs.configsArray.length;
     const hour_in_sec = 3600;
     const user_sec = msToSec(server_parameters.timer_interval);
@@ -372,6 +378,6 @@ export default class ListenerManager {
         `Listeners reached limit!
         \rDeactivate ${over_limit} listeners to avoid block requests and 403 error.`
       );
-    }
+    } else console.log("limit has not reached. continue...");
   }
 }

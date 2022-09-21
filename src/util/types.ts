@@ -51,6 +51,11 @@ export const valid_configs_keys = {
 };
 
 export type ConfigsCVS = ConfigGithub | ConfigBitbucket | ConfigGitlab;
+export type AllConfigs =
+  | ConfigServer
+  | ConfigGithub
+  | ConfigBitbucket
+  | ConfigGitlab;
 
 export type supportableCVS = "github" | "bitbucket" | "gitlab";
 
@@ -220,3 +225,5 @@ export type AxiosGitlab = {
 };
 
 export type AxiosConfigs = AxiosGithub | AxiosBitbucket | AxiosGitlab;
+
+export type cryptoType = "encode" | "decode";

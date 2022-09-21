@@ -146,6 +146,8 @@ export class Quiz {
     );
     await github_config.setProperty(id, "branch", String(branch_name));
 
+    await github_config.setProperty(id, "status", "inactive");
+
     await github_config.saveAll(override);
 
     if (resolve) resolve();
@@ -209,8 +211,9 @@ export class Quiz {
         if (!output) throw new Error("Branch name is necessary!");
       }
     );
-
     await bitbucket_config.setProperty(id, "branch", String(branch_name));
+
+    await bitbucket_config.setProperty(id, "status", "inactive");
 
     await bitbucket_config.saveAll(override);
 
@@ -222,10 +225,13 @@ export class Quiz {
     const gitlab_config = new ConfigFactory(cvs_name);
     await gitlab_config.init();
 
+    this.onClose(gitlab_config);
+
     const id = override ? 0 : gitlab_config.getLastCVSConfigId();
 
-    if (gitlab_config.isEmptySpecified(id))
+    if (gitlab_config.isEmptySpecified(id)) {
       await gitlab_config.addEmptyTemplateCVSConfig(id);
+    }
 
     await gitlab_config.setProperty(id, "id", id);
 
@@ -254,8 +260,17 @@ export class Quiz {
 
     await gitlab_config.setProperty(id, "branch", String(branch_name));
 
+    await gitlab_config.setProperty(id, "status", "inactive");
+
     await gitlab_config.saveAll(override);
 
     if (resolve) resolve();
+  }
+
+  private onClose(config: ConfigFactory) {
+    this.input.on("close", async () => {
+      if (!config.isEmpty()) await config.clearEmptyAndPendingObjects(true);
+      process.exit(0);
+    });
   }
 }

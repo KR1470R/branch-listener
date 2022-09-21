@@ -42,8 +42,7 @@ function kill_listener {
 }
 
 function restart_listener {
-    kill_listener 
-    runTool "start"
+    curl localhost:3001/restart
 }
 
 function uninstall_listener {
@@ -166,10 +165,8 @@ function narrowing() {
     id="$3"
     key="$4"
     value="$5"
-
-    if [ "$tool_name" = "restart" ]; then
-        restart_listener
-    elif [ "$tool_name" = "kill" ]; then
+    
+    if [ "$tool_name" = "kill" ]; then
         kill_listener
     elif [ "$tool_name" = "uninstall" ]; then
         uninstall_listener

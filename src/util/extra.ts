@@ -84,3 +84,9 @@ export const isArraysEqual = (a: unknown[], b: unknown[]) => {
 };
 
 export const msToSec = (ms: number) => ms / 1000;
+
+export const isUTF8 = (str: string) => {
+  const base64regex =
+    /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
+  return base64regex.test(str);
+};

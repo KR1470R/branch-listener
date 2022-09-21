@@ -30,8 +30,11 @@
   },
   "homepage": "https://github.com/KR1470R/branch-listener#readme",
   "dependencies": {
+    "@types/base-64": "^1.0.0",
     "@types/node-notifier": "^8.0.2",
+    "@types/utf8": "^3.0.1",
     "axios": "^0.27.2",
+    "base-64": "^1.0.0",
     "console-table-printer": "^2.11.1",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
@@ -39,7 +42,8 @@
     "module-name": "^0.0.1-security",
     "node-notifier": "^10.0.1",
     "play-sound": "^1.1.5",
-    "ts": "^0.0.0"
+    "ts": "^0.0.0",
+    "utf8": "^3.0.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.13",

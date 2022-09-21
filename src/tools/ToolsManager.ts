@@ -5,9 +5,10 @@ import {
 import ListenerManager from "../listeners/ListenerManager";
 import express from "express";
 import ConfigFactory from "../util/ConfigFactory";
-import { supportableCVS } from "../util/types";
+import { ConfigServer, supportableCVS } from "../util/types";
 import { Quiz } from "../util/Quiz";
 import { signalManager } from "../util/extra";
+import axios from "axios";
 
 export default class ToolsManager {
   private listenerManager: ListenerManager;
@@ -84,7 +85,7 @@ export default class ToolsManager {
   public async run() {
     const config_server = new ConfigFactory("server");
     await config_server.init();
-    const server_properties = await config_server.getAllProperties();
+    const server_properties = await config_server.getAllProperties(0);
     console.log(
       `Running BRANCH-LISTENER-SERVER with config: ${JSON.stringify(
         {
@@ -97,10 +98,17 @@ export default class ToolsManager {
 
     const app = express();
 
+    app.get("/restart", async (req, res) => {
+      const response = "Restarted by user.";
+      await this.listenerManager.stopAllListeners(true, response);
+      await this.listenerManager.activateAllListeners(true);
+      res.send(response);
+    });
+
     const port = await config_server.getProperty(0, "port");
 
-    const server = app.listen(port, () => {
-      this.listenerManager.spawnAllListeners();
+    const server = app.listen(port, async () => {
+      await this.listenerManager.spawnAllListeners();
     });
 
     signalManager.addCallback(server.close.bind(server));
@@ -134,6 +142,18 @@ export default class ToolsManager {
 
     await this.listenerManager.activateListenerStatus(this.cvs_name!, this.id!);
 
+    return Promise.resolve(true);
+  }
+
+  public async restart() {
+    const config_server = new ConfigFactory("server");
+    await config_server.init();
+    const server_properties = (await config_server.getAllProperties(
+      0
+    )) as ConfigServer;
+    await axios.get(`http://localhost:${server_properties.port}/restart`);
+
+    console.log("Restarted by user.");
     return Promise.resolve(true);
   }
 

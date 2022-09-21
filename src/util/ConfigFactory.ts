@@ -5,9 +5,9 @@ import {
   ConfigGitlab,
   supportable_configs,
   ConfigsCVS,
+  AllConfigs,
   ListenerStatus,
   valid_configs_keys,
-  supportableCVS,
 } from "../util/types";
 import JSONManager from "./JSONManager";
 import { getBaseDir, isArrayHasAnyEmptyObject } from "./extra";
@@ -25,7 +25,7 @@ export default class ConfigFactory {
   public async init() {
     this.manager = new JSONManager(
       `${this.base_path}${this.type}/${this.config_name}`,
-      this.type as supportableCVS
+      this.type as supportable_configs
     );
     await this.manager.init();
   }
@@ -53,22 +53,34 @@ export default class ConfigFactory {
     }
   }
 
-  public defineConfig(id = 0) {
-    const definedConfig = this.getAllConfigs()[id];
+  private getConfigById(id: number) {
+    const allConfigs = this.getAllConfigs();
+    const filteredConfigs = (allConfigs as AllConfigs[]).filter((config) => {
+      if (this.type === "server") return true;
+      return (config as ConfigsCVS).id === id;
+    });
+    if (filteredConfigs.length === 0) throw new Error("Config not found!");
+
+    return filteredConfigs[0] as AllConfigs;
+  }
+
+  public defineConfig(id: number) {
+    const definedConfig = this.getConfigById(id);
 
     return definedConfig;
   }
 
-  public getProperty(id = 0, key: string): Promise<number | string> {
+  public getProperty(id: number, key: string) {
     const config = this.defineConfig(id);
+
     return config[key as keyof typeof config];
   }
 
-  public getAllProperties(id = 0) {
+  public getAllProperties(id: number) {
     return this.defineConfig(id);
   }
 
-  public setProperty(id = 0, key: string, value: string | number) {
+  public setProperty(id: number, key: string, value: string | number) {
     const config = this.defineConfig(id);
 
     config[key as keyof typeof config] = value as keyof typeof config;
@@ -78,8 +90,8 @@ export default class ConfigFactory {
     await this.manager.save(override);
   }
 
-  private getKeys(id = 0): string[] {
-    return Object.keys(this.manager.content[id]);
+  private getKeys(id: number): string[] {
+    return Object.keys(this.getConfigById(id));
   }
 
   public async checkValidation() {
@@ -106,11 +118,11 @@ export default class ConfigFactory {
           );
       }
     } else {
-      for (
-        let config_id = 0;
-        config_id <= this.manager.content.length - 1;
-        config_id++
-      ) {
+      const configs_id = (this.getAllConfigs() as ConfigsCVS[]).map(
+        (config) => config.id
+      );
+
+      for (const config_id of configs_id) {
         const cvs_parameters = this.getKeys(config_id);
 
         for (const valid_key of valid_configs_keys[this.type]) {
@@ -147,7 +159,11 @@ export default class ConfigFactory {
   }
 
   public async removeConfig(id: number) {
-    await this.manager.removeSpecifiedObject(id);
+    const config_id = (this.getAllConfigs() as ConfigsCVS[]).indexOf(
+      this.getConfigById(id) as ConfigsCVS
+    );
+
+    await this.manager.removeSpecifiedObject(config_id);
   }
 
   public getLastCVSConfigId() {
@@ -169,9 +185,11 @@ export default class ConfigFactory {
 
     if (!this.manager) throw new Error("JSON manager was not initilized!");
 
-    this.manager.content.splice(id, 0, configs_template);
+    if (this.manager.content.length === 0)
+      this.manager.content.push(configs_template);
+    else this.manager.content.splice(id, 0, configs_template);
 
-    await this.manager.save(false);
+    await this.manager.save(!Boolean(id), true);
   }
 
   public async setStatusListener(id: number, status: ListenerStatus) {
@@ -196,5 +214,11 @@ export default class ConfigFactory {
 
     if (config) return true;
     else return false;
+  }
+
+  public async clearEmptyAndPendingObjects(withSave: boolean) {
+    await this.manager.clearEmptyAndPendingObjects();
+
+    if (withSave) await this.manager.save(false);
   }
 }

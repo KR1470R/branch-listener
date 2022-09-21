@@ -17,6 +17,9 @@ const toolManager = new ToolsManager(
   value
 );
 
+// ignore terminal signal on these tools
+const ignore_tools = ["setup", "add"];
+
 toolManager
   .init()
   .then(() => {
@@ -25,6 +28,7 @@ toolManager
       add: toolManager.add.bind(toolManager),
       run: toolManager.run.bind(toolManager),
       start: toolManager.start.bind(toolManager),
+      restart: toolManager.restart.bind(toolManager),
       stop: toolManager.stop.bind(toolManager),
       remove: toolManager.remove.bind(toolManager),
       list: toolManager.list.bind(toolManager),
@@ -36,7 +40,8 @@ toolManager
     ]() as Promise<boolean>;
   })
   .then((exit: boolean) => {
-    return signalManager.listenEvents(exit);
+    if (ignore_tools.includes(tool_name)) return Promise.resolve();
+    else return signalManager.listenEvents(exit);
   })
   .catch((err) => {
     throw new Error(err);

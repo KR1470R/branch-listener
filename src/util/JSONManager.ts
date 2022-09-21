@@ -4,8 +4,11 @@ import {
   signalManager,
   Events,
   isArraysEqual,
+  isUTF8,
 } from "./extra";
-import { supportableCVS } from "./types";
+import { supportable_configs, cryptoType } from "./types";
+import base64 from "base-64";
+import utf8 from "utf8";
 
 export default class JSONManager {
   public path!: string;
@@ -16,11 +19,11 @@ export default class JSONManager {
   };
   private watcher!: fs.FSWatcher;
   private saved_by_self = false;
-  private cvs_type?: supportableCVS;
+  private type?: supportable_configs;
 
-  constructor(path: string, cvs_type?: supportableCVS | undefined) {
+  constructor(path: string, type?: supportable_configs | undefined) {
     this.path = path;
-    this.cvs_type = cvs_type;
+    this.type = type;
   }
 
   public async init() {
@@ -29,7 +32,8 @@ export default class JSONManager {
     const file = fs.readFileSync(this.path, { encoding: "utf8", flag: "r" });
     if (file) this.contents = JSON.parse(file)["all"];
     else this.contents = this.base_template["all"];
-    // this.content_backup = JSON.parse(JSON.stringify(this.contents));
+
+    this.cryptoAll("decode");
 
     //update file if it has been changed
     this.watcher = fs.watch(this.path, "utf8", (event: string) => {
@@ -45,8 +49,9 @@ export default class JSONManager {
 
           this.contents = new_contents;
 
-          if (this.cvs_type)
-            Events.emit(`${this.cvs_type}_updated`, this.contents);
+          this.cryptoAll("decode");
+
+          if (this.type) Events.emit(`${this.type}_updated`, this.contents);
         }
       }
     });
@@ -84,20 +89,18 @@ export default class JSONManager {
     });
   }
 
-  public async save(override: boolean) {
-    if (
-      this.base_template.all[0] &&
-      Object.keys(this.base_template.all[0]).length === 0
-    )
-      this.base_template.all.shift();
+  public async save(override: boolean, skipClear = false) {
+    if (!override && !skipClear) await this.clearEmptyAndPendingObjects();
 
-    this.clearEmptyObjects();
+    this.cryptoAll("encode");
 
     if (override) {
       await fs.promises.writeFile(this.path, "");
       this.base_template.all = [this.contents[0]];
     } else this.base_template.all = this.contents;
+
     this.saved_by_self = true;
+
     await fs.promises.writeFile(
       this.path,
       JSON.stringify(this.base_template, null, "\t"),
@@ -113,14 +116,18 @@ export default class JSONManager {
     return Promise.resolve();
   }
 
-  private clearEmptyObjects() {
-    if (Array.isArray(this.contents)) {
-      for (const obj of this.contents) {
-        if (typeof obj !== "object" || !Object.keys(obj).length) {
-          this.contents.slice(this.contents.indexOf(obj), 1);
-        }
+  public clearEmptyAndPendingObjects() {
+    return new Promise<void>((resolve) => {
+      if (Array.isArray(this.contents)) {
+        this.contents = this.contents.filter((obj) => {
+          if (Object.keys(obj).length === 0) return false;
+          if (obj["status" as keyof typeof obj] === "pending") return false;
+          return true;
+        });
       }
-    }
+
+      resolve();
+    });
   }
 
   public async removeSpecifiedObject(id: number) {
@@ -143,5 +150,37 @@ export default class JSONManager {
 
   public closeWatcher() {
     this.watcher.close();
+  }
+
+  // encode or decode cvs configs.
+  private crypto(data: string, type: cryptoType): string {
+    let bytes;
+    let result;
+    switch (type) {
+      case "decode":
+        if (!isUTF8(data)) data = this.crypto(data, "encode");
+        bytes = base64.decode(data);
+        result = utf8.decode(bytes);
+        break;
+      case "encode":
+        bytes = utf8.encode(data);
+        result = base64.encode(bytes);
+        break;
+    }
+    return result;
+  }
+
+  private cryptoAll(type: cryptoType) {
+    if (this.type === "server") return;
+
+    const keys_ignore = ["id", "status"];
+
+    for (const obj of this.contents) {
+      for (const key in obj) {
+        type key_of = keyof typeof obj;
+        if (keys_ignore.includes(key)) continue;
+        obj[key as key_of] = this.crypto(obj[key as key_of], type) as key_of;
+      }
+    }
   }
 }
