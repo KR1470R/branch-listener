@@ -66,7 +66,7 @@ Beforehand you start the configuration you need to provide such information for 
 For git you will need provide: username, repository name and branch name you want listen to;\
 For bitbucket: username, app password, workspace name, repository slug and branch name.\
 For gitlab: project id, token and branch name;\
-***‼️All your passwords will be stored on your local system without theft‼️***\
+***‼️All your passwords will be stored on your local system without theft‼️ And stay encrypted.***\
  **Let's start**
  
     git clone https://github.com/KR1470R/branch-listener.git

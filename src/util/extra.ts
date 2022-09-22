@@ -90,3 +90,26 @@ export const isUTF8 = (str: string) => {
     /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
   return base64regex.test(str);
 };
+
+export const getApplications = (sum: number) => {
+  const nums: number[] = [];
+
+  const getSumAll = () => {
+    let sum_all = 0;
+    nums.forEach((num) => (sum_all += num));
+    return sum_all;
+  };
+
+  const getNewNum = () => {
+    while (true) {
+      const rand_num = getRandomInt(1, 5);
+      if (rand_num + getSumAll() <= sum) return rand_num;
+      else continue;
+    }
+  };
+
+  while (true) {
+    if (getSumAll() === sum) return nums;
+    nums.push(getNewNum());
+  }
+};

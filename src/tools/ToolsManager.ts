@@ -193,7 +193,7 @@ export default class ToolsManager {
 
   private checkCVSData(onlyCVS = false, withLogs = true) {
     const log = (msg: string) => {
-      if (withLogs) console.log(msg);
+      if (withLogs) console.log(`WARNING: ${msg}`);
     };
 
     if (!this.cvs_name) {

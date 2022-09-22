@@ -14,12 +14,15 @@ import { getBaseDir, isArrayHasAnyEmptyObject } from "./extra";
 
 export default class ConfigFactory {
   private readonly base_path: string = `${getBaseDir()}configs/`;
-  private config_name = "config.json";
+  private config_name;
   public type: supportable_configs;
   public manager!: JSONManager;
 
   constructor(config_type: supportable_configs) {
     this.type = config_type;
+    if (this.type === "server") {
+      this.config_name = "config.json";
+    } else this.config_name = "config";
   }
 
   public async init() {
