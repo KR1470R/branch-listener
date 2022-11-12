@@ -44,7 +44,6 @@ export const valid_configs_keys = {
     "app_password",
     "workspace",
     "repository_slug",
-    "token",
     "branch",
   ],
   gitlab: ["id", "status", "project_id", "token", "branch"],
@@ -227,3 +226,8 @@ export type AxiosGitlab = {
 export type AxiosConfigs = AxiosGithub | AxiosBitbucket | AxiosGitlab;
 
 export type cryptoType = "encode" | "decode";
+
+export type ToolResponse = {
+  exit: boolean;
+  response?: string | number;
+};

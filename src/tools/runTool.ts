@@ -1,6 +1,6 @@
 import ToolsManager from "./ToolsManager";
 import process from "process";
-import { supportableCVS } from "../util/types";
+import { supportableCVS, ToolResponse } from "../util/types";
 import { signalManager } from "../util/extra";
 
 const [tool_name, cvs_name, id, key, value] = process.argv.slice(2);
@@ -18,7 +18,10 @@ const toolManager = new ToolsManager(
 );
 
 // ignore terminal signal on these tools
-const ignore_tools = ["setup", "add"];
+const ignore_tools = [
+  // "setup",
+  "add",
+];
 
 toolManager
   .init()
@@ -33,15 +36,19 @@ toolManager
       remove: toolManager.remove.bind(toolManager),
       list: toolManager.list.bind(toolManager),
       edit: toolManager.edit.bind(toolManager),
+      port: toolManager.getPort.bind(toolManager),
     };
 
-    return definedFunctions[
-      tool_name as keyof typeof definedFunctions
-    ]() as Promise<boolean>;
+    const specified_function =
+      definedFunctions[tool_name as keyof typeof definedFunctions];
+    if (!specified_function) throw new Error(`uknown tool - ${tool_name}`);
+
+    return specified_function() as Promise<ToolResponse>;
   })
-  .then((exit: boolean) => {
+  .then((response: ToolResponse) => {
+    if (response.response) console.log(response.response);
     if (ignore_tools.includes(tool_name)) return Promise.resolve();
-    else return signalManager.listenEvents(exit);
+    else return signalManager.listenEvents(response.exit);
   })
   .catch((err) => {
     throw new Error(err);

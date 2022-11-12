@@ -18,7 +18,7 @@ function check_perfomance {
     fi
 
     if [ -n "$BRANCH_LISTENER_MAIN_DIR" ] && [ -f "$BRANCH_LISTENER_MAIN_DIR"/configs/server/config.json ]; then
-        BRANCH_LISTENER_PORT=$(cat "$BRANCH_LISTENER_MAIN_DIR"/configs/server/config.json | grep port | grep -Eo '[0-9]{1,10}')
+        BRANCH_LISTENER_PORT=$(runTool "port" | tail -1)
     fi
 }
 
@@ -42,7 +42,13 @@ function kill_listener {
 }
 
 function restart_listener {
-    curl localhost:3001/restart
+    echo "checking is listener alive..."
+    if [ -n "$BRANCH_LISTENER_PORT" ] && [ "$(lsof -t -i:$BRANCH_LISTENER_PORT -sTCP:LISTEN)" ]; then
+        curl localhost:"$BRANCH_LISTENER_PORT"/restart
+        echo "listener has been restarted"
+    else 
+        echo "listener is not alive at port <$BRANCH_LISTENER_PORT>"
+    fi 
 }
 
 function uninstall_listener {
@@ -95,6 +101,7 @@ function uninstall_listener {
 }
 
 function status_listener {
+    echo "$BRANCH_LISTENER_PORT"
     if [ "$(lsof -t -i:$BRANCH_LISTENER_PORT -sTCP:LISTEN)" ]; then
         echo "branch-listener is alive at $BRANCH_LISTENER_PORT" false
     else 

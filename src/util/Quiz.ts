@@ -100,6 +100,7 @@ export class Quiz {
     await config_server.saveAll(override);
 
     if (resolve) resolve();
+    else return Promise.resolve();
   }
 
   public async github(override: boolean, resolve?: () => Promise<void>) {

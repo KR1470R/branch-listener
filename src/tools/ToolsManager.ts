@@ -5,7 +5,7 @@ import {
 import ListenerManager from "../listeners/ListenerManager";
 import express from "express";
 import ConfigFactory from "../util/ConfigFactory";
-import { ConfigServer, supportableCVS } from "../util/types";
+import { ConfigServer, supportableCVS, ToolResponse } from "../util/types";
 import { Quiz } from "../util/Quiz";
 import { signalManager } from "../util/extra";
 import axios from "axios";
@@ -17,6 +17,10 @@ export default class ToolsManager {
   private key?: string;
   private value?: string;
   private isBegining: boolean;
+
+  private response: ToolResponse = {
+    exit: true,
+  };
 
   /**
    * @param isBegining true if branch-listener runs setup.
@@ -79,7 +83,7 @@ export default class ToolsManager {
 
     await quiz.server(true, finish);
 
-    return Promise.resolve(true);
+    return Promise.resolve(this.response);
   }
 
   public async run() {
@@ -113,7 +117,9 @@ export default class ToolsManager {
 
     signalManager.addCallback(server.close.bind(server));
 
-    return Promise.resolve(false);
+    this.response.exit = false;
+
+    return Promise.resolve(this.response);
   }
 
   public async add() {
@@ -131,18 +137,19 @@ export default class ToolsManager {
     await definedCVSQuiz[this.cvs_name](false);
 
     quiz.closePrompt();
-    return Promise.resolve(1);
+
+    return Promise.resolve(this.response);
   }
 
   public async start() {
     if (!this.checkCVSData()) {
       await this.listenerManager.activateAllListeners();
-      return Promise.resolve(true);
+      return Promise.resolve(this.response);
     }
 
     await this.listenerManager.activateListenerStatus(this.cvs_name!, this.id!);
 
-    return Promise.resolve(true);
+    return Promise.resolve(this.response);
   }
 
   public async restart() {
@@ -154,7 +161,7 @@ export default class ToolsManager {
     await axios.get(`http://localhost:${server_properties.port}/restart`);
 
     console.log("Restarted by user.");
-    return Promise.resolve(true);
+    return Promise.resolve(this.response);
   }
 
   public async stop() {
@@ -169,13 +176,13 @@ export default class ToolsManager {
       );
     else await this.listenerManager.stopAllListeners(true, reason);
 
-    return Promise.resolve(true);
+    return Promise.resolve(this.response);
   }
 
   public async remove() {
     if (this.checkCVSData())
       await this.listenerManager.killListener(this.cvs_name!, this.id!);
-    return Promise.resolve(true);
+    return Promise.resolve(this.response);
   }
 
   public list() {
@@ -188,7 +195,7 @@ export default class ToolsManager {
       }
     }
 
-    return Promise.resolve(true);
+    return Promise.resolve(this.response);
   }
 
   private checkCVSData(onlyCVS = false, withLogs = true) {
@@ -210,7 +217,7 @@ export default class ToolsManager {
   }
 
   public async edit() {
-    if (!this.checkCVSData()) return Promise.resolve(true);
+    if (!this.checkCVSData()) return Promise.resolve(this.response);
 
     await this.listenerManager.setListenerMeta(
       this.cvs_name!,
@@ -219,6 +226,18 @@ export default class ToolsManager {
       this.value!
     );
 
-    return Promise.resolve(true);
+    return Promise.resolve(this.response);
+  }
+
+  public async getPort() {
+    const config_server = new ConfigFactory("server");
+    await config_server.init();
+    const server_properties = (await config_server.getAllProperties(
+      0
+    )) as ConfigServer;
+
+    this.response.response = server_properties.port;
+
+    return Promise.resolve(this.response);
   }
 }
