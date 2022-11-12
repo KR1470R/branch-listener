@@ -69,7 +69,7 @@ For gitlab: project id, token and branch name;\
 ***‼️All your passwords will be stored on your local system without theft‼️ And stay encrypted.***\
  **Let's start**
  
-    git clone https://github.com/KR1470R/branch-listener.git
+    git clone https://github.com/KR1470R/branch-listener.git && cd branch-listener
     npm i
     npm run build
     ./branch-listener setup
